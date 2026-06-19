@@ -46,7 +46,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - **Dataset / shape:** A fixed synthetic vector (e.g. 1e7-element float32 array) and a fixed launch-count loop; pinned GPU/driver/CUDA versions.
 - **Pass bar:** cudarc+NVRTC launch overhead within a small constant factor of the CuPy/raw baseline (sanity threshold, e.g. ≤ ~2–3× per-launch overhead) and vector-op result correct — confirming the toolchain is not pathologically slow. This is a feasibility sanity check, not a speed gate.
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Toolchain prerequisites (install Rust ≥1.83, verify MSVC/NVRTC/maturin) + persisted Cargo workspace + sylva-cuda crate + maturin abi3 pyproject + CI + VERSIONS.md template (D-04)
+- [ ] 01-02-PLAN.md — NVRTC compile+launch of vector_add (TOOL-01) and a representative privatized histogram kernel, compute-sanitizer clean (TOOL-02)
+- [ ] 01-03-PLAN.md — abi3 wheel (dynamic-loading) builds + imports in a clean venv (TOOL-03), fairness-encoded microbench vs CuPy/raw baseline, finalize VERSIONS.md kill-decision (TOOL-04)
 **UI hint**: no
 
 ### Phase 2: CPU Oracle, Contracts & Forest IR
