@@ -113,15 +113,68 @@ Explicitly excluded. Documented to prevent scope creep.
 
 Which phases cover which requirements. Populated during roadmap creation.
 
+> Note: Each phase additionally carries a **Comparative Baseline Study** (see ROADMAP.md) — an existing-library + baseline-implementation comparison with associated success criteria. These studies are success-criteria additions on top of the requirements below (foundational phases test correctness-parity / microbenchmarks; the benchmark requirements BENCH-01..03 own the authoritative crossover). They introduce **no new requirement IDs**, so coverage remains 38/38.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (to be filled by roadmap) | — | Pending |
+| TOOL-01 | Phase 1 | Pending |
+| TOOL-02 | Phase 1 | Pending |
+| TOOL-03 | Phase 1 | Pending |
+| TOOL-04 | Phase 1 | Pending |
+| ENG-01 | Phase 2 | Pending |
+| ENG-02 | Phase 2 | Pending |
+| ENG-03 | Phase 2 | Pending |
+| ENG-04 | Phase 2 | Pending |
+| ENG-05 | Phase 2 | Pending |
+| ENG-06 | Phase 2 | Pending |
+| EST-07 | Phase 2 | Pending |
+| QUANT-01 | Phase 3 | Pending |
+| QUANT-02 | Phase 3 | Pending |
+| GPU-01 | Phase 4 | Pending |
+| GPU-02 | Phase 4 | Pending |
+| GPU-03 | Phase 5 | Pending |
+| GPU-04 | Phase 5 | Pending |
+| GPU-05 | Phase 5 | Pending |
+| GPU-06 | Phase 5 | Pending |
+| EST-01 | Phase 5 | Pending |
+| EST-02 | Phase 5 | Pending |
+| EST-03 | Phase 5 | Pending |
+| EST-04 | Phase 5 | Pending |
+| EST-05 | Phase 5 | Pending |
+| EST-06 | Phase 5 | Pending |
+| DET-01 | Phase 6 | Pending |
+| DET-02 | Phase 6 | Pending |
+| DET-03 | Phase 6 | Pending |
+| DET-04 | Phase 6 | Pending |
+| BENCH-01 | Phase 7 | Pending |
+| BENCH-02 | Phase 7 | Pending |
+| BENCH-03 | Phase 7 | Pending |
+| SHAP-01 | Phase 8 | Pending |
+| SHAP-02 | Phase 8 | Pending |
+| SHAP-03 | Phase 8 | Pending |
+| EXP-01 | Phase 9 | Pending |
+| EXP-02 | Phase 9 | Pending |
+| EXP-03 | Phase 9 | Pending |
 
 **Coverage:**
-- v1 requirements: 33 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 33 ⚠️
+- v1 requirements: 38 total (enumerated IDs; supersedes the earlier header estimate of 33)
+- Mapped to phases: 38 ✓
+- Unmapped: 0 ✓
+
+**Coverage by phase:**
+
+| Phase | Requirements | Count |
+|-------|--------------|-------|
+| 1 — Toolchain Spike (Gate 1) | TOOL-01, TOOL-02, TOOL-03, TOOL-04 | 4 |
+| 2 — CPU Oracle, Contracts & Forest IR | ENG-01..06, EST-07 | 7 |
+| 3 — Feature Quantizer | QUANT-01, QUANT-02 | 2 |
+| 4 — Single GPU ExtraTree | GPU-01, GPU-02 | 2 |
+| 5 — Full Forest, RandomForest & sklearn Estimators | GPU-03..06, EST-01..06 | 10 |
+| 6 — Determinism & Honest Dispatch | DET-01..04 | 4 |
+| 7 — Crossover Benchmark (Gate 3) | BENCH-01..03 | 3 |
+| 8 — Exact Tree SHAP (Gate 2 + Implementation) | SHAP-01..03 | 3 |
+| 9 — Treelite Export & Packaging | EXP-01..03 | 3 |
 
 ---
 *Requirements defined: 2026-06-20*
-*Last updated: 2026-06-20 after initial definition*
+*Last updated: 2026-06-20 — roadmap revised to add a per-phase Comparative Baseline Study + fairness note; no new requirement IDs, coverage unchanged at 38/38*
