@@ -1,6 +1,14 @@
 ---
-gsd_state_version: '1.0'
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+current_phase: 1
+current_phase_name: Toolchain Spike (Gate 1
 status: planning
+stopped_at: Phase 1 context gathered
+last_updated: "2026-06-19T18:53:54.165Z"
+last_activity: 2026-06-20
+last_activity_desc: "Roadmap revised: added a per-phase Comparative Baseline Study (existing-library + baseline-implementation comparison) to all 9 phases, calibrated to what each phase can honestly measure (correctness-parity / microbench for Phases 1–4; first real speed claim at Phase 5; authoritative crossover at Phase 7), plus a binding comparative-study fairness note"
 progress:
   total_phases: 9
   completed_phases: 0
@@ -30,6 +38,7 @@ Progress: [░░░░░░░░░░] 0%
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: — min
 - Total execution time: 0.0 hours
@@ -41,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: —
 - Trend: —
 
@@ -84,6 +94,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20
-Stopped at: Roadmap revised to add a per-phase Comparative Baseline Study + fairness note (all 9 phases); STATE concerns updated. REQUIREMENTS.md traceability unchanged (38/38 still mapped). Ready to plan Phase 1.
-Resume file: None
+Last session: 2026-06-19T18:53:54.158Z
+Stopped at: Phase 1 context gathered
+Resume file: .planning/phases/01-toolchain-spike-gate-1/01-CONTEXT.md
