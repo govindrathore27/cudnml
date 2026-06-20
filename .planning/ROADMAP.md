@@ -50,11 +50,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - **Dataset / shape:** A fixed synthetic vector (e.g. 1e7-element float32 array) and a fixed launch-count loop; pinned GPU/driver/CUDA versions.
 - **Pass bar:** cudarc+NVRTC launch overhead within a small constant factor of the CuPy/raw baseline (sanity threshold, e.g. ≤ ~2–3× per-launch overhead) and vector-op result correct — confirming the toolchain is not pathologically slow. This is a feasibility sanity check, not a speed gate.
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Toolchain prerequisites (install Rust ≥1.83, verify MSVC/NVRTC/maturin) + persisted Cargo workspace + sylva-cuda crate + maturin abi3 pyproject + CI + VERSIONS.md template (D-04)
+- [x] 01-01-PLAN.md — Toolchain prerequisites (install Rust ≥1.83, verify MSVC/NVRTC/maturin) + persisted Cargo workspace + sylva-cuda crate + maturin abi3 pyproject + CI + VERSIONS.md template (D-04)
 - [ ] 01-02-PLAN.md — NVRTC compile+launch of vector_add (TOOL-01) and a representative privatized histogram kernel, compute-sanitizer clean (TOOL-02)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -279,7 +279,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Spike (Gate 1) | 0/TBD | Not started | - |
+| 1. Toolchain Spike (Gate 1) | 1/3 | In Progress|  |
 | 2. CPU Oracle, Contracts & Forest IR | 0/TBD | Not started | - |
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
 | 4. Single GPU ExtraTree | 0/TBD | Not started | - |
