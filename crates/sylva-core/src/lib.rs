@@ -11,6 +11,7 @@ pub mod config;
 pub mod cpu;
 pub mod error;
 pub mod ir;
+pub mod parity;
 pub mod rng;
 
 pub use backend::{Backend, HistogramBackend, Predictions};
@@ -18,3 +19,4 @@ pub use config::{Algo, Criterion, MaxFeatures, Task, TrainConfig};
 pub use cpu::CpuBackend;
 pub use error::SylvaError;
 pub use ir::ForestIR;
+pub use parity::{split_statistics, SplitObservation, SplitStats};
