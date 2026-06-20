@@ -1,0 +1,25 @@
+# Python packaging for the sylva-core test-only PyO3 seam.
+#
+# Run from the crates/sylva-core directory:
+#   maturin develop --features pyseam
+# or with a specific venv:
+#   VIRTUAL_ENV=../../.venv-parity maturin develop --features pyseam
+#
+# This seam exposes fit_cpu / predict_cpu / split_statistics from CpuBackend to
+# the Phase-05 parity harness. It is TEST-ONLY and strictly below the full
+# sklearn-parity estimator API (EST-02), deferred to Phase 5.
+[build-system]
+requires = ["maturin>=1.14,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "sylva-core-pyseam"
+description = "Test-only PyO3 seam: CpuBackend fit_cpu/predict_cpu/split_statistics (Phase-05 parity harness)."
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dynamic = ["version"]
+
+[tool.maturin]
+# manifest-path omitted — maturin defaults to Cargo.toml in the same dir.
+module-name = "sylva_core_pyseam"
+features = ["pyseam"]

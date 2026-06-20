@@ -1,0 +1,45 @@
+{
+  "_provenance": {
+    "description": "Empirically calibrated parity thresholds from the sklearn-vs-sklearn null spread (Phase-05 D-04 calibration).  Set ABOVE the measured null spread so the gate is NOT trivially satisfied.  Do NOT edit manually.",
+    "n_calibration_seeds": 12,
+    "n_estimators": 200,
+    "datasets": {
+      "clf": "make_classification_20k_50",
+      "reg": "make_regression_20k_50"
+    },
+    "python": "3.12.8 (tags/v3.12.8:2dc476b, Dec  3 2024, 19:30:04) [MSC v.1942 64 bit (AMD64)]",
+    "sklearn": "1.9.0",
+    "scipy": "1.18.0",
+    "numpy": "2.4.6",
+    "sylva_commit": "87c367a0519c",
+    "dataset_seed": 20250620
+  },
+  "et_clf": {
+    "accuracy_tolerance": 0.01,
+    "ks_pvalue_floor_freq": 0.8692618870414056,
+    "ks_pvalue_floor_thr": 0.01,
+    "_null_accuracy_mean": 0.9330833333333334,
+    "_null_accuracy_stdev": 0.0016248543058229967
+  },
+  "rf_clf": {
+    "accuracy_tolerance": 0.01,
+    "ks_pvalue_floor_freq": 0.8936330242012815,
+    "ks_pvalue_floor_thr": 0.01,
+    "_null_accuracy_mean": 0.9442291666666667,
+    "_null_accuracy_stdev": 0.001354530836813548
+  },
+  "et_reg": {
+    "r2_tolerance": 0.010762596648672264,
+    "ks_pvalue_floor_freq": 0.5486851446031328,
+    "ks_pvalue_floor_thr": 0.01,
+    "_null_r2_mean": 0.473528741501919,
+    "_null_r2_stdev": 0.003587532216224088
+  },
+  "rf_reg": {
+    "r2_tolerance": 0.01,
+    "ks_pvalue_floor_freq": 0.5486851446031328,
+    "ks_pvalue_floor_thr": 0.01,
+    "_null_r2_mean": 0.6602551264722597,
+    "_null_r2_stdev": 0.0011365891061394125
+  }
+}
