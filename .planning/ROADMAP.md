@@ -89,11 +89,26 @@ Plans:
 
 **Plans**: 5 plans
 Plans:
+**Wave 1**
+
 - [ ] 02-01-PLAN.md — sylva-core crate, device-neutral Backend trait, SoA ForestIR, Philox-4×32-10 + verified KAT vectors (ENG-01, ENG-02, ENG-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 02-02-PLAN.md — CpuBackend ExtraTrees slice: criterion, random-threshold splitter, recursive builder, NaN-safe predict (ENG-03, ENG-05)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 02-03-PLAN.md — CpuBackend RandomForest slice: bootstrap + exact best-split, completing ET/RF × clf/reg (ENG-03)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 02-04-PLAN.md — Property invariants + byte-determinism + parity contract doc + split_statistics extractor (EST-07, ENG-04)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 02-05-PLAN.md — Test-only PyO3 seam + sklearn calibration + distributional parity gate (ENG-04, EST-07)
+
 **UI hint**: no
 
 ### Phase 3: Feature Quantizer (CPU/GPU Bit-Parity)
