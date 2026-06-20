@@ -15,6 +15,7 @@ pub mod criterion;
 pub mod fit;
 pub mod predict;
 pub mod split_et;
+pub mod split_rf;
 
 use ndarray::{ArrayView1, ArrayView2};
 
