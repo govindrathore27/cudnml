@@ -1,0 +1,17 @@
+# Sylva — GPU-Native Forest Ensembles (Rust core, Python API)
+# Workspace root. Phase 1 is a throwaway toolchain spike (D-04: persist the
+# skeleton so Phase 2's `trait Backend` / `CpuBackend` / `ForestIR` drop in
+# cleanly). Only the spike *kernel logic* is throwaway — this structure stays.
+
+[workspace]
+resolver = "2"
+members = ["crates/sylva-cuda"]
+
+# Shared package metadata inherited by member crates via `*.workspace = true`.
+# Keeps the license + MSRV pinned in one place (no hardcoded duplication).
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0"           # PROJECT.md constraint: Apache-2.0 only.
+rust-version = "1.83"            # MSRV floor set by PyO3 0.29 (verified 01-RESEARCH.md).
+authors = ["Sylva contributors"]
+repository = "https://github.com/sylva/sylva"

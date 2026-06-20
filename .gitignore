@@ -1,0 +1,12 @@
+# Rust build output
+/target/
+
+# Python extension artifacts + caches
+*.pyd
+__pycache__/
+
+# Virtual environments (incl. the Plan 03 CuPy Py3.12 baseline venv)
+.venv*/
+
+# Built wheels / sdists
+dist/

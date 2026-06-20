@@ -1,0 +1,48 @@
+# sylva-cuda — the Phase 1 toolchain-spike crate. In Phase 4+ this becomes the
+# CudaBackend; for now it only proves the cudarc + NVRTC + PyO3 path links.
+[package]
+name = "sylva-cuda"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "GPU-native forest-ensemble CUDA backend (Phase 1 toolchain spike)."
+
+[lib]
+# cdylib  -> the Python extension module (.pyd) that maturin packages.
+# rlib    -> lets Rust integration tests / future crates link against this crate.
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Launch-proof feature set (D-02 / D-03): driver + nvrtc + STATIC link against
+# the installed CUDA 12.8 toolkit (cuda-12080). default-features = false is
+# REQUIRED to drop cublas/cublaslt/curand/runtime — none are needed in Phase 1
+# (Philox is hand-rolled later; no GEMM in the hot path). See 01-RESEARCH.md
+# Pitfall 3.
+#
+# `dynamic-linking` is the mandatory link-MODE selector for the build-time
+# launch proof: cudarc 0.19.8's build.rs panics unless exactly one of
+# {dynamic-loading, fallback-dynamic-loading, dynamic-linking, static-linking}
+# is active, and `cuda-12080` only selects the CUDA *version* bindings — it is
+# NOT a link mode. (01-PLAN.md's `["driver","nvrtc","cuda-12080"]` omitted the
+# mode and would panic; see 01-01-SUMMARY.md "Deviations".)
+#
+# Why `dynamic-linking` and not `static-linking`: on native Windows/MSVC,
+# cudarc's `static-linking` requires the GNU/Clang static lib `stdc++` (errors
+# `could not find native static library stdc++`), which does not exist in the
+# MSVC toolchain. `dynamic-linking` links against the installed CUDA 12.8
+# toolkit's import libraries at build time — which IS D-02's intent ("link
+# against the installed CUDA 12.8 toolkit" for the launch proof), and is
+# distinct from the wheel's runtime `dynamic-loading`.
+#
+# NOTE: the SHIPPING wheel build (Plan 03, D-02) swaps these features to
+# ["driver", "nvrtc", "dynamic-loading"] so CUDA is resolved at runtime via the
+# driver (one wheel for any compatible CUDA). The committed default stays the
+# toolkit-linked launch-proof set below.
+cudarc = { version = "0.19.8", default-features = false, features = ["driver", "nvrtc", "cuda-12080", "dynamic-linking"] }
+
+# PyO3 abi3 (stable ABI): one cp310-abi3 wheel runs on any CPython >= 3.10
+# (covers the local Python 3.14.3). extension-module is the .pyd build mode.
+pyo3 = { version = "0.29.0", features = ["extension-module", "abi3-py310"] }

@@ -1,0 +1,21 @@
+# Python packaging for the sylva-cuda extension. Phase 1 only CREATES this
+# config; the actual wheel build is Plan 03. maturin is the canonical PyO3
+# build backend (native Windows abi3 wheels).
+[build-system]
+requires = ["maturin>=1.14,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "sylva-cuda"
+description = "GPU-native forest-ensemble CUDA backend (Phase 1 toolchain spike)."
+requires-python = ">=3.10"          # abi3-py310 floor (covers local Python 3.14.3).
+license = { text = "Apache-2.0" }
+dynamic = ["version"]                # version sourced from the crate, not hardcoded.
+
+[tool.maturin]
+# Point maturin at the spike crate's manifest and name the imported module
+# `sylva_cuda` (must match the #[pymodule] fn name in src/lib.rs).
+manifest-path = "crates/sylva-cuda/Cargo.toml"
+module-name = "sylva_cuda"
+# abi3 wheel: one cp310-abi3-win_amd64 wheel works on any CPython >= 3.10.
+# (PyO3 0.27+/maturin 1.9.4+ sets the extension-module env automatically.)

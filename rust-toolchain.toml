@@ -1,0 +1,7 @@
+# Pin the toolchain to STABLE (never nightly — CLAUDE.md "What NOT to Use":
+# nightly is needed only by the rejected rustc_codegen_nvvm path). The
+# cudarc + NVRTC path builds on stable Rust >= 1.83.
+[toolchain]
+channel = "stable"
+targets = ["x86_64-pc-windows-msvc"]
+profile = "default"
