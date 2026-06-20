@@ -10,6 +10,7 @@
 //! - `fit`       — Recursive node builder, rayon forest loop.
 //! - `predict`   — NaN-safe forest traversal + aggregation.
 
+pub mod bootstrap;
 pub mod criterion;
 pub mod fit;
 pub mod predict;
