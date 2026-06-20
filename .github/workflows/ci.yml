@@ -1,0 +1,54 @@
+# Sylva CI -- Phase 1 toolchain spike.
+#
+# HONEST RUNNER STORY (do NOT silently mark GPU steps as passing):
+#
+#   GitHub-hosted `windows-latest` runners have NO NVIDIA GPU and NO CUDA
+#   toolkit. The committed default features for `sylva-cuda` include cudarc
+#   `dynamic-linking` + `cuda-12080`, which link against the CUDA 12.8 toolkit
+#   IMPORT LIBRARIES at BUILD time. Therefore `cargo build`/`cargo test` of this
+#   crate CANNOT run on a hosted runner -- there is nothing to link against, and
+#   no GPU to launch the `nvrtc_launch_vector_add` proof on.
+#
+#   So this workflow splits into two honest jobs:
+#     * `lint`       runs on hosted `windows-latest` and only does work that
+#                    needs NO CUDA (rustfmt). It gives real, green signal.
+#     * `build-test` is pinned to a SELF-HOSTED Windows runner labelled with
+#                    `cuda` + `gpu`. If no such runner is registered the job is
+#                    simply NOT RUN (skipped) -- it is never falsely green.
+#
+#   The maturin wheel-import smoke (Plan 03) is likewise a self-hosted concern.
+
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  lint:
+    name: lint (hosted, no CUDA)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      # rustfmt does not compile the crate, so it needs no CUDA toolkit.
+      - name: cargo fmt --check
+        run: cargo fmt --all --check
+
+  build-test:
+    name: build + test (self-hosted GPU + CUDA 12.8)
+    # Requires a self-hosted Windows runner with the CUDA 12.8 toolkit and an
+    # NVIDIA GPU. Absent such a runner this job is skipped, never falsely green.
+    runs-on: [ self-hosted, windows, cuda, gpu ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo build (links CUDA 12.8 import libs)
+        run: cargo build --workspace
+      # `cargo test` runs `smoke_crate_links`; `nvrtc_launch_vector_add` is
+      # `#[ignore]`d until Plan 02 and is therefore skipped here by default.
+      - name: cargo test
+        run: cargo test --workspace
