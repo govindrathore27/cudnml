@@ -58,4 +58,35 @@ fn nvrtc_launch_vector_add() {
     }
 }
 
-// (histogram_privatized_matches_cpu is added by Task 2.)
+/// Fixed problem size for the histogram correctness proof. Chosen to span many
+/// blocks (n / 256) so the two-level reduction and the privatized shared-mem
+/// path are genuinely exercised.
+const HISTOGRAM_N: usize = 1_000_000;
+
+/// Task 2: the representative 256-bin shared-memory privatized histogram
+/// compiled by NVRTC launches on the GPU and matches a trivial CPU reference
+/// count exactly (integer equality across all 256 bins).
+#[test]
+fn histogram_privatized_matches_cpu() {
+    // Deterministic bin indices in [0, 256): a simple mixing of the index so the
+    // distribution is non-uniform (exercises uneven bin contention) yet exactly
+    // reproducible without an RNG.
+    let bins: Vec<u8> = (0..HISTOGRAM_N)
+        .map(|i| ((i * 31 + 7) % 256) as u8)
+        .collect();
+
+    // CPU reference: a trivial count loop.
+    let mut expected = vec![0u32; 256];
+    for &b in &bins {
+        expected[b as usize] += 1;
+    }
+
+    let got = sylva_cuda::run_histogram(&bins)
+        .expect("NVRTC compile + launch of histogram_privatized on sm_89 must succeed");
+
+    assert_eq!(got.len(), 256, "histogram must have 256 bins");
+    assert_eq!(
+        got, expected,
+        "GPU histogram must equal the CPU reference exactly"
+    );
+}
