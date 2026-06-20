@@ -87,7 +87,7 @@ Plans:
 - **Dataset / shape:** A small public dataset — `make_classification` (e.g. 20k×50) and/or a Covertype subset — fixed seed, identical hyperparameters across both implementations.
 - **Pass bar:** **Parity within stated tolerance is the gate** (accuracy within CI, split-distribution equivalent). Training-time difference is **reported, not gated** — speed is informational at this phase.
 
-**Plans**: 1/5 plans executed
+**Plans**: 2/5 plans executed
 Plans:
 **Wave 1**
 
@@ -95,7 +95,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — CpuBackend ExtraTrees slice: criterion, random-threshold splitter, recursive builder, NaN-safe predict (ENG-03, ENG-05)
+- [x] 02-02-PLAN.md — CpuBackend ExtraTrees slice: criterion, random-threshold splitter, recursive builder, NaN-safe predict (ENG-03, ENG-05)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -301,7 +301,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Toolchain Spike (Gate 1) | 3/3 | Complete    | 2026-06-20 |
-| 2. CPU Oracle, Contracts & Forest IR | 1/5 | In Progress|  |
+| 2. CPU Oracle, Contracts & Forest IR | 2/5 | In Progress|  |
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
 | 4. Single GPU ExtraTree | 0/TBD | Not started | - |
 | 5. Full Forest, RandomForest & sklearn Estimators | 0/TBD | Not started | - |
