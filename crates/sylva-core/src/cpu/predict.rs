@@ -346,4 +346,76 @@ mod tests {
         let x_bad = Array2::<f32>::zeros((5, 3));
         assert!(predict_forest(&ir, x_bad.view()).is_err());
     }
+
+    // -----------------------------------------------------------------------
+    // RF predict tests (Task 3 — reuses the unchanged predict path)
+    // -----------------------------------------------------------------------
+
+    fn rf_clf_cfg_tiny() -> TrainConfig {
+        TrainConfig {
+            n_estimators: 5,
+            max_depth: Some(3),
+            max_features: MaxFeatures::Sqrt,
+            min_samples_split: 2,
+            min_samples_leaf: 1,
+            bootstrap: true,
+            criterion: Criterion::Gini,
+            seed: 55,
+            algo: Algo::RandomForest,
+        }
+    }
+
+    fn rf_reg_cfg_tiny() -> TrainConfig {
+        TrainConfig {
+            n_estimators: 5,
+            max_depth: Some(3),
+            max_features: MaxFeatures::All,
+            min_samples_split: 2,
+            min_samples_leaf: 1,
+            bootstrap: true,
+            criterion: Criterion::Mse,
+            seed: 66,
+            algo: Algo::RandomForest,
+        }
+    }
+
+    #[test]
+    fn rf_clf_predict_proba_shape_and_sum() {
+        let x = Array2::from_shape_fn((20, 2), |(i, j)| if j == 0 { i as f32 } else { 0.5 });
+        let y = ndarray::Array1::from_iter((0..20).map(|i| if i < 10 { 0.0 } else { 1.0 }));
+        let cfg = rf_clf_cfg_tiny();
+        let ir = fit_forest(x.view(), y.view(), &cfg).expect("RF clf fit");
+        let preds = predict_forest(&ir, x.view()).expect("RF clf predict");
+        match preds {
+            Predictions::ClassProba(p) => {
+                assert_eq!(p.nrows(), 20, "RF clf: wrong row count in proba output");
+                assert_eq!(p.ncols(), 2, "RF clf: wrong class count in proba output");
+                for row in p.rows() {
+                    let s: f32 = row.iter().sum();
+                    assert_abs_diff_eq!(s, 1.0_f32, epsilon = 1e-5);
+                }
+            }
+            _ => panic!("RF clf: expected ClassProba"),
+        }
+    }
+
+    #[test]
+    fn rf_reg_predict_values_finite() {
+        let x = Array2::from_shape_fn((20, 2), |(i, j)| if j == 0 { i as f32 } else { 0.5 });
+        let y = ndarray::Array1::from_iter((0..20).map(|i| i as f32));
+        let cfg = rf_reg_cfg_tiny();
+        let ir = fit_forest(x.view(), y.view(), &cfg).expect("RF reg fit");
+        let preds = predict_forest(&ir, x.view()).expect("RF reg predict");
+        match preds {
+            Predictions::Regression(v) => {
+                for &val in v.iter() {
+                    assert!(
+                        val.is_finite(),
+                        "RF reg: prediction must be finite, got {val}"
+                    );
+                }
+            }
+            _ => panic!("RF reg: expected Regression"),
+        }
+    }
 }

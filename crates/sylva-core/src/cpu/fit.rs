@@ -1,4 +1,4 @@
-//! Recursive ExtraTrees forest builder (ENG-03).
+//! Recursive forest builder for ExtraTrees and RandomForest (ENG-03).
 //!
 //! `fit_forest` builds `n_estimators` trees in parallel (rayon) over trees,
 //! sequential within each tree, with Philox-keyed draws per `(tree, node, ...)`.
@@ -10,17 +10,35 @@
 //! target sums, leaf means) use a fixed sequential row order — never a rayon
 //! parallel sum inside a tree.
 //!
-//! **Bootstrap:** ExtraTrees uses ALL rows per tree (`bootstrap = false`);
-//! RandomForest (Plan 03) adds bootstrap sampling here.
+//! **Algorithm dispatch:** `build_node` dispatches on `cfg.algo`:
+//! - `ExtraTrees` → `best_random_split` (one random threshold per feature).
+//! - `RandomForest` → `best_split` (sorted-midpoint exhaustive search).
+//!
+//! **Bootstrap:** `cfg.bootstrap == true` (RF default) draws `n` rows with
+//! replacement via `bootstrap_indices`; `false` (ET default) uses all rows.
+//! The bootstrap draw is keyed by `(seed, tree)` so per-tree sampling is
+//! order-independent under rayon (T-02-10).
 
 use ndarray::{ArrayView1, ArrayView2};
 use rayon::prelude::*;
 
-use crate::config::{Criterion, Task, TrainConfig};
+use crate::config::{Algo, Criterion, Task, TrainConfig};
+use crate::cpu::bootstrap::bootstrap_indices;
 use crate::cpu::criterion::{entropy, gini, mse};
 use crate::cpu::split_et::{best_random_split, EtSplitCtx};
+use crate::cpu::split_rf::{best_split as rf_best_split, RfSplitCtx};
 use crate::error::SylvaError;
 use crate::ir::{ForestIR, LEAF_FEATURE, NO_CHILD};
+
+/// Common split decision fields returned by both ET and RF splitters.
+/// Used to avoid a complex tuple in `build_node`.
+struct NodeSplit {
+    feature_id: usize,
+    threshold: f32,
+    left_rows: Vec<usize>,
+    right_rows: Vec<usize>,
+    default_left: bool,
+}
 
 /// Build a complete ExtraTrees (or ET-mode) forest.
 ///
@@ -61,20 +79,29 @@ pub(crate) fn fit_forest(
 
     // Pre-collect y as a plain Vec<f32> so we can pass slices to closures.
     let y_vec: Vec<f32> = y.iter().copied().collect();
-    // All-row index (ET uses all rows, no bootstrap).
+    // All-row index used when bootstrap=false (ET default).
     let all_rows: Vec<usize> = (0..n_rows).collect();
 
     // Build each tree independently.  Because each tree's Philox draws are
     // keyed by `tree_id`, the parallel and sequential builds produce identical
     // per-tree ForestIR fragments.
     let n_trees = cfg.n_estimators;
+    let seed = cfg.seed;
+    let use_bootstrap = cfg.bootstrap;
     let trees: Vec<TreeFragment> = (0..n_trees)
         .into_par_iter()
         .map(|tree_id| {
+            // RF: draw n rows with replacement (keyed by tree → order-independent).
+            // ET: use all rows.
+            let tree_rows: Vec<usize> = if use_bootstrap {
+                bootstrap_indices(n_rows, seed, tree_id as u32)
+            } else {
+                all_rows.clone()
+            };
             build_tree(
                 x,
                 &y_vec,
-                &all_rows,
+                &tree_rows,
                 tree_id as u32,
                 cfg,
                 task,
@@ -203,28 +230,61 @@ fn build_node(
         return node_idx;
     }
 
-    // Try to find a valid split.
-    let split_ctx = EtSplitCtx {
-        x: ctx.x,
-        rows,
-        y: ctx.y,
-        n_classes: ctx.n_classes,
-        max_features: ctx.resolved_max_features,
-        criterion: ctx.criterion,
-        task: ctx.task,
-        min_samples_leaf: ctx.cfg.min_samples_leaf,
-        seed: ctx.cfg.seed,
-        tree_id: ctx.tree_id,
-        node_id,
+    // Try to find a valid split — dispatch on algorithm.
+    // Both ET and RF return equivalent fields; we extract them into a common
+    // `NodeSplit` so the recursion below is algorithm-independent.
+    let split_opt: Option<NodeSplit> = match ctx.cfg.algo {
+        Algo::ExtraTrees => {
+            let et_ctx = EtSplitCtx {
+                x: ctx.x,
+                rows,
+                y: ctx.y,
+                n_classes: ctx.n_classes,
+                max_features: ctx.resolved_max_features,
+                criterion: ctx.criterion,
+                task: ctx.task,
+                min_samples_leaf: ctx.cfg.min_samples_leaf,
+                seed: ctx.cfg.seed,
+                tree_id: ctx.tree_id,
+                node_id,
+            };
+            best_random_split(&et_ctx).map(|s| NodeSplit {
+                feature_id: s.feature_id,
+                threshold: s.threshold,
+                left_rows: s.left_rows,
+                right_rows: s.right_rows,
+                default_left: s.default_left,
+            })
+        }
+        Algo::RandomForest => {
+            let rf_ctx = RfSplitCtx {
+                x: ctx.x,
+                rows,
+                y: ctx.y,
+                n_classes: ctx.n_classes,
+                max_features: ctx.resolved_max_features,
+                criterion: ctx.criterion,
+                task: ctx.task,
+                min_samples_leaf: ctx.cfg.min_samples_leaf,
+                seed: ctx.cfg.seed,
+                tree_id: ctx.tree_id,
+                node_id,
+            };
+            rf_best_split(&rf_ctx).map(|s| NodeSplit {
+                feature_id: s.feature_id,
+                threshold: s.threshold,
+                left_rows: s.left_rows,
+                right_rows: s.right_rows,
+                default_left: s.default_left,
+            })
+        }
     };
-    let split = best_random_split(&split_ctx);
 
-    if split.is_none() {
+    let Some(split) = split_opt else {
         // No valid split found — emit a leaf.
         emit_leaf(rows, ctx.y, ctx.task, ctx.n_classes, n, node_imp, frag);
         return node_idx;
-    }
-    let split = split.unwrap();
+    };
 
     // Reserve the slot for this internal node (children filled after recursion).
     frag.feature_id.push(split.feature_id as i32);
@@ -694,5 +754,238 @@ mod tests {
         let y_short = ndarray::Array1::<f32>::zeros(5);
         let cfg = clf_cfg();
         assert!(fit_forest(x.view(), y_short.view(), &cfg).is_err());
+    }
+
+    // -----------------------------------------------------------------------
+    // RandomForest-specific tests (Task 3 — SC-2 / D-02)
+    // -----------------------------------------------------------------------
+
+    fn rf_clf_cfg() -> TrainConfig {
+        TrainConfig {
+            n_estimators: 5,
+            max_depth: Some(4),
+            max_features: MaxFeatures::Sqrt,
+            min_samples_split: 2,
+            min_samples_leaf: 1,
+            bootstrap: true, // RF default
+            criterion: Criterion::Gini,
+            seed: 42,
+            algo: Algo::RandomForest,
+        }
+    }
+
+    fn rf_reg_cfg() -> TrainConfig {
+        TrainConfig {
+            n_estimators: 5,
+            max_depth: Some(4),
+            max_features: MaxFeatures::All, // reg default — all features (RESEARCH Pitfall 5)
+            min_samples_split: 2,
+            min_samples_leaf: 1,
+            bootstrap: true,
+            criterion: Criterion::Mse,
+            seed: 42,
+            algo: Algo::RandomForest,
+        }
+    }
+
+    // --- RF clf: fit, validate, leaf proba ---
+
+    #[test]
+    fn rf_clf_forest_builds_and_validates() {
+        let (x, y) = make_clf_data();
+        let cfg = rf_clf_cfg();
+        let ir = fit_forest(x.view(), y.view(), &cfg).expect("RF clf fit");
+        ir.validate_structure().expect("RF clf validate");
+        assert_eq!(ir.n_trees, cfg.n_estimators);
+    }
+
+    #[test]
+    fn rf_clf_leaf_probas_sum_to_one() {
+        let (x, y) = make_clf_data();
+        let cfg = rf_clf_cfg();
+        let ir = fit_forest(x.view(), y.view(), &cfg).expect("RF clf fit");
+        let nc = ir.n_classes();
+        let mut found_leaf = false;
+        for i in 0..ir.node_count() {
+            if ir.is_leaf[i] {
+                found_leaf = true;
+                let lo = ir.leaf_offset[i] as usize;
+                let sum: f32 = ir.leaf_proba[lo * nc..(lo + 1) * nc].iter().sum();
+                assert_abs_diff_eq!(sum, 1.0_f32, epsilon = 1e-5);
+            }
+        }
+        assert!(found_leaf, "RF clf: should have at least one leaf");
+    }
+
+    // --- RF reg: fit, validate, leaf values finite ---
+
+    #[test]
+    fn rf_reg_forest_builds_and_validates() {
+        let (x, y) = make_reg_data();
+        let cfg = rf_reg_cfg();
+        let ir = fit_forest(x.view(), y.view(), &cfg).expect("RF reg fit");
+        ir.validate_structure().expect("RF reg validate");
+    }
+
+    #[test]
+    fn rf_reg_leaf_values_are_finite() {
+        let (x, y) = make_reg_data();
+        let cfg = rf_reg_cfg();
+        let ir = fit_forest(x.view(), y.view(), &cfg).expect("RF reg fit");
+        for &v in &ir.leaf_value {
+            assert!(v.is_finite(), "RF reg: leaf_value must be finite; got {v}");
+        }
+    }
+
+    // --- RF determinism ---
+
+    #[test]
+    fn rf_seed_determinism_byte_identical() {
+        let (x, y) = make_clf_data();
+        let cfg = rf_clf_cfg();
+        let ir1 = fit_forest(x.view(), y.view(), &cfg).expect("RF fit 1");
+        let ir2 = fit_forest(x.view(), y.view(), &cfg).expect("RF fit 2");
+        let s1 = serde_json::to_string(&ir1).expect("ser1");
+        let s2 = serde_json::to_string(&ir2).expect("ser2");
+        assert_eq!(s1, s2, "RF: same seed must produce byte-identical IR");
+    }
+
+    /// RF parallel-build == sequential-build invariant (T-02-10).
+    ///
+    /// The rayon `par_iter` may process trees in any order. Because bootstrap
+    /// indices and split draws are both keyed by `(seed, tree, ...)`, two
+    /// independent calls with the same config MUST produce the same ForestIR.
+    #[test]
+    fn rf_parallel_equals_sequential() {
+        let (x, y) = make_clf_data();
+        let cfg = TrainConfig {
+            n_estimators: 8,
+            max_depth: Some(3),
+            max_features: MaxFeatures::Sqrt,
+            min_samples_split: 2,
+            min_samples_leaf: 1,
+            bootstrap: true,
+            criterion: Criterion::Gini,
+            seed: 77,
+            algo: Algo::RandomForest,
+        };
+        let ir_a = fit_forest(x.view(), y.view(), &cfg).expect("RF par a");
+        let ir_b = fit_forest(x.view(), y.view(), &cfg).expect("RF par b");
+        let sa = serde_json::to_string(&ir_a).unwrap();
+        let sb = serde_json::to_string(&ir_b).unwrap();
+        assert_eq!(
+            sa, sb,
+            "RF parallel/sequential must be byte-identical (T-02-10)"
+        );
+    }
+
+    // --- RF cover invariant ---
+
+    #[test]
+    fn rf_cover_invariant_parent_equals_left_plus_right() {
+        // Bootstrap sample counts are per-bootstrap-row (not global data rows),
+        // so the cover invariant still holds within the tree.
+        let (x, y) = make_clf_data();
+        let cfg = rf_clf_cfg();
+        let ir = fit_forest(x.view(), y.view(), &cfg).expect("RF fit");
+        for i in 0..ir.node_count() {
+            if !ir.is_leaf[i] {
+                let l = ir.left_child[i] as usize;
+                let r = ir.right_child[i] as usize;
+                assert_eq!(
+                    ir.node_sample_count[i],
+                    ir.node_sample_count[l] + ir.node_sample_count[r],
+                    "RF cover invariant failed at node {i}"
+                );
+            }
+        }
+    }
+
+    // --- Four-estimator matrix (SC-2 / D-02) ---
+
+    /// All four combinations (ET/RF × clf/reg) must build a valid ForestIR.
+    /// This is the SC-2 / D-02 acceptance test: the oracle covers the full
+    /// estimator matrix this phase.
+    #[test]
+    fn all_four_estimators_build_and_validate() {
+        let (xc, yc) = make_clf_data();
+        let (xr, yr) = make_reg_data();
+
+        let configs: &[(&str, TrainConfig, bool)] = &[
+            (
+                "ET clf",
+                TrainConfig {
+                    algo: Algo::ExtraTrees,
+                    bootstrap: false,
+                    criterion: Criterion::Gini,
+                    max_features: MaxFeatures::Sqrt,
+                    n_estimators: 3,
+                    max_depth: Some(4),
+                    min_samples_split: 2,
+                    min_samples_leaf: 1,
+                    seed: 1,
+                },
+                true, // is_clf
+            ),
+            (
+                "ET reg",
+                TrainConfig {
+                    algo: Algo::ExtraTrees,
+                    bootstrap: false,
+                    criterion: Criterion::Mse,
+                    max_features: MaxFeatures::All,
+                    n_estimators: 3,
+                    max_depth: Some(4),
+                    min_samples_split: 2,
+                    min_samples_leaf: 1,
+                    seed: 2,
+                },
+                false,
+            ),
+            (
+                "RF clf",
+                TrainConfig {
+                    algo: Algo::RandomForest,
+                    bootstrap: true,
+                    criterion: Criterion::Gini,
+                    max_features: MaxFeatures::Sqrt,
+                    n_estimators: 3,
+                    max_depth: Some(4),
+                    min_samples_split: 2,
+                    min_samples_leaf: 1,
+                    seed: 3,
+                },
+                true,
+            ),
+            (
+                "RF reg",
+                TrainConfig {
+                    algo: Algo::RandomForest,
+                    bootstrap: true,
+                    criterion: Criterion::Mse,
+                    max_features: MaxFeatures::All,
+                    n_estimators: 3,
+                    max_depth: Some(4),
+                    min_samples_split: 2,
+                    min_samples_leaf: 1,
+                    seed: 4,
+                },
+                false,
+            ),
+        ];
+
+        for (name, cfg, is_clf) in configs {
+            let (x, y) = if *is_clf {
+                (xc.view(), yc.view())
+            } else {
+                (xr.view(), yr.view())
+            };
+            let ir = fit_forest(x, y, cfg).unwrap_or_else(|e| {
+                panic!("{name}: fit_forest failed: {e}");
+            });
+            ir.validate_structure()
+                .unwrap_or_else(|e| panic!("{name}: validate_structure failed: {e}"));
+            assert_eq!(ir.n_trees, cfg.n_estimators, "{name}: n_trees mismatch");
+        }
     }
 }
