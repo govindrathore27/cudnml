@@ -15,6 +15,14 @@ description = "GPU-native forest-ensemble CUDA backend (Phase 1 toolchain spike)
 # rlib    -> lets Rust integration tests / future crates link against this crate.
 crate-type = ["cdylib", "rlib"]
 
+# Fairness-encoded launch/throughput microbench (SC-6). `harness = false` -> a
+# plain `fn main()` (no libtest/criterion); it runs full timing by default and a
+# fast correctness-only path under `-- --test` (the plan's verify gate). Uses the
+# default `cuda-static` feature like `cargo test`.
+[[bench]]
+name = "microbench"
+harness = false
+
 [dependencies]
 # Launch-proof feature set (D-02 / D-03): driver + nvrtc + STATIC link against
 # the installed CUDA 12.8 toolkit (cuda-12080). default-features = false is
