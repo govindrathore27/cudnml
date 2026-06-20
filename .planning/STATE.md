@@ -6,15 +6,15 @@ current_phase: 01
 current_phase_name: toolchain-spike-gate-1
 status: executing
 stopped_at: Phase 1 context gathered
-last_updated: "2026-06-20T04:31:29.060Z"
+last_updated: "2026-06-20T04:48:13.937Z"
 last_activity: 2026-06-19
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 9
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 0
+  completed_plans: 3
+  percent: 11
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-19)
 ## Current Position
 
 Phase: 01 (toolchain-spike-gate-1) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-19 — Phase 01 execution started
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01 P02 | ~30min | 3 tasks | 8 files |
+| Phase 01 P03 | ~10min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - [Roadmap]: CPU oracle (Phase 2) before any GPU kernel — it is the bit-level correctness oracle and enables GPU-less cloud CI.
 - [Roadmap]: Every phase carries a Comparative Baseline Study (vs an existing library + a baseline-implementation) calibrated to what it can honestly measure — correctness-parity / microbenchmark for foundational Phases 1–4 (NO end-to-end speed claim), the first real end-to-end speed claim at Phase 5, and the authoritative pre-registered (n×d) crossover at Phase 7 into which all per-phase studies feed.
 - [Phase ?]: TOOL-01/TOOL-02 proven: cudarc 0.19.8 + NVRTC compiles hand-written CUDA-C for sm_89, launches bit-exact on RTX 4060 Ti; privatized histogram compute-sanitizer-clean (all 4 tools 0 errors)
+- [Phase ?]: Phase 1 / Gate 1 kill-decision: PROCEED — cudarc+NVRTC+PyO3/maturin proven natively on Windows/MSVC (TOOL-01..04 + SC-6 all green)
+- [Phase ?]: Link modes via Cargo feature toggle: default=cuda-static (launch proof), wheel=dynamic-loading (abi3 wheel); cuda-12080 required in both
 
 ### Pending Todos
 
@@ -96,6 +99,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20T04:31:00.059Z
+Last session: 2026-06-20T04:47:46.885Z
 Stopped at: Phase 1 context gathered
 Resume file: .planning/phases/01-toolchain-spike-gate-1/01-CONTEXT.md

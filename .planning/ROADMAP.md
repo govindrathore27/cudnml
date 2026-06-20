@@ -15,7 +15,7 @@ Sylva proves a single, falsifiable thesis: GPU-native Extra Trees / Random Fores
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Toolchain Spike (Gate 1)** - Prove cudarc+NVRTC builds a debuggable, packageable CUDA kernel natively on Windows
+- [x] **Phase 1: Toolchain Spike (Gate 1)** - Prove cudarc+NVRTC builds a debuggable, packageable CUDA kernel natively on Windows (completed 2026-06-20)
 - [ ] **Phase 2: CPU Oracle, Contracts & Forest IR** - Pure-Rust correctness oracle, Backend trait, SoA ForestIR, parity contract, differential tests
 - [ ] **Phase 3: Feature Quantizer (CPU/GPU Bit-Parity)** - SoA BinnedMatrix with bit-identical CPU↔GPU bin assignments
 - [ ] **Phase 4: Single GPU ExtraTree** - One GPU ExtraTree (privatized shared-mem histograms, breadth-first) bit-exact vs CPU oracle
@@ -50,7 +50,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - **Dataset / shape:** A fixed synthetic vector (e.g. 1e7-element float32 array) and a fixed launch-count loop; pinned GPU/driver/CUDA versions.
 - **Pass bar:** cudarc+NVRTC launch overhead within a small constant factor of the CuPy/raw baseline (sanity threshold, e.g. ≤ ~2–3× per-launch overhead) and vector-op result correct — confirming the toolchain is not pathologically slow. This is a feasibility sanity check, not a speed gate.
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans complete
 Plans:
 **Wave 1**
 
@@ -59,7 +59,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-03-PLAN.md — abi3 wheel (dynamic-loading) builds + imports in a clean venv (TOOL-03), fairness-encoded microbench vs CuPy/raw baseline, finalize VERSIONS.md kill-decision (TOOL-04)
+- [x] 01-03-PLAN.md — abi3 wheel (dynamic-loading) builds + imports in a clean venv (TOOL-03), fairness-encoded microbench vs CuPy/raw baseline, finalize VERSIONS.md kill-decision (TOOL-04)
 
 **UI hint**: no
 
@@ -279,7 +279,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Spike (Gate 1) | 2/3 | In Progress|  |
+| 1. Toolchain Spike (Gate 1) | 3/3 | Complete   | 2026-06-20 |
 | 2. CPU Oracle, Contracts & Forest IR | 0/TBD | Not started | - |
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
 | 4. Single GPU ExtraTree | 0/TBD | Not started | - |
