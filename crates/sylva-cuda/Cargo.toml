@@ -41,8 +41,22 @@ crate-type = ["cdylib", "rlib"]
 # ["driver", "nvrtc", "dynamic-loading"] so CUDA is resolved at runtime via the
 # driver (one wheel for any compatible CUDA). The committed default stays the
 # toolkit-linked launch-proof set below.
-cudarc = { version = "0.19.8", default-features = false, features = ["driver", "nvrtc", "cuda-12080", "dynamic-linking"] }
+# `std` is a pure marker feature (`std = []` in cudarc 0.19.8 — NO extra deps,
+# does NOT pull cublas/curand/runtime, so Pitfall 3 / D-03 stay honoured). It is
+# REQUIRED here because cudarc gates `impl std::error::Error for DriverError`
+# (and `CompileError`) behind `#[cfg(feature = "std")]`; `default-features =
+# false` drops it, which makes thiserror's `#[from]` fail to find the `Error`
+# impl. Adding `std` restores the std error trait so our typed `CudaError` can
+# wrap cudarc errors and every device call propagates via `?` (no silent
+# fallback).
+cudarc = { version = "0.19.8", default-features = false, features = ["std", "driver", "nvrtc", "cuda-12080", "dynamic-linking"] }
 
 # PyO3 abi3 (stable ABI): one cp310-abi3 wheel runs on any CPython >= 3.10
 # (covers the local Python 3.14.3). extension-module is the .pyd build mode.
 pyo3 = { version = "0.29.0", features = ["extension-module", "abi3-py310"] }
+
+# Typed library error enum (CLAUDE.md-pinned). Maps cudarc DriverError /
+# CompileError into a single crate error so every device call propagates a
+# Result via `?` (no `.unwrap()`/`.expect()` on device calls — no silent
+# fallback). Version inherited from the workspace.
+thiserror = { workspace = true }

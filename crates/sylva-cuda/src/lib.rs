@@ -7,6 +7,14 @@
 
 use pyo3::prelude::*;
 
+pub mod kernels;
+pub mod nvrtc_launch;
+
+// Re-export the GPU entrypoints so integration tests, the standalone sanitizer
+// target, and Plan 03's PyO3 wrapper call them as `sylva_cuda::run_vector_add` /
+// `sylva_cuda::run_histogram` without reaching into module paths.
+pub use nvrtc_launch::{run_histogram, run_vector_add, CudaError};
+
 /// Return the crate version, sourced from `CARGO_PKG_VERSION` at compile time.
 ///
 /// No hardcoded version string (coding-style: no hardcoded values). A non-empty

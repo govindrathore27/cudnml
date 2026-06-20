@@ -15,3 +15,10 @@ license = "Apache-2.0"           # PROJECT.md constraint: Apache-2.0 only.
 rust-version = "1.83"            # MSRV floor set by PyO3 0.29 (verified 01-RESEARCH.md).
 authors = ["Sylva contributors"]
 repository = "https://github.com/sylva/sylva"
+
+# Shared dependency versions inherited by member crates via `*.workspace = true`.
+# thiserror is the CLAUDE.md-pinned library error-enum crate (1.x) — used to map
+# cudarc Results into a typed crate error so no device call ever `.unwrap()`s
+# (no-silent-fallback). Pinned in one place to avoid version drift.
+[workspace.dependencies]
+thiserror = "1"
