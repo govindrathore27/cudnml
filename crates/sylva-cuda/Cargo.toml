@@ -49,7 +49,20 @@ crate-type = ["cdylib", "rlib"]
 # impl. Adding `std` restores the std error trait so our typed `CudaError` can
 # wrap cudarc errors and every device call propagates via `?` (no silent
 # fallback).
-cudarc = { version = "0.19.8", default-features = false, features = ["std", "driver", "nvrtc", "cuda-12080", "dynamic-linking"] }
+# cudarc's link MODE is selected via a Cargo feature TOGGLE (Plan 03), because the
+# two D-02 link modes are mutually exclusive but both must be provably exercised:
+#   - `cuda-static`  (default) -> ["cuda-12080", "dynamic-linking"]: the Plan 01/02
+#     launch proof; links against the installed CUDA 12.8 toolkit at build time.
+#   - `wheel`                  -> ["dynamic-loading"]: the SHIPPING abi3 wheel
+#     (D-02); CUDA is resolved at RUNTIME via the driver -> one wheel for any
+#     compatible CUDA. Built with `--no-default-features --features wheel`.
+# Only `driver`, `nvrtc`, `std` are unconditional here; the link-mode features are
+# added by the toggle below. `default-features = false` stays REQUIRED to drop
+# cublas/cublaslt/curand/runtime (Pitfall 3 / D-03). `std` is a pure marker
+# feature (`std = []` in cudarc 0.19.8 — NO extra deps) needed because cudarc gates
+# `impl std::error::Error for DriverError`/`CompileError` behind `#[cfg(feature =
+# "std")]`; without it thiserror's `#[from]` cannot find the `Error` impl.
+cudarc = { version = "0.19.8", default-features = false, features = ["std", "driver", "nvrtc"] }
 
 # PyO3 abi3 (stable ABI): one cp310-abi3 wheel runs on any CPython >= 3.10
 # (covers the local Python 3.14.3). extension-module is the .pyd build mode.
@@ -60,3 +73,24 @@ pyo3 = { version = "0.29.0", features = ["extension-module", "abi3-py310"] }
 # Result via `?` (no `.unwrap()`/`.expect()` on device calls — no silent
 # fallback). Version inherited from the workspace.
 thiserror = { workspace = true }
+
+[features]
+# D-02 link-mode toggle. EXACTLY one of these governs how cudarc links CUDA; the
+# two modes are mutually exclusive (cudarc 0.19.8's build.rs panics unless exactly
+# one of {dynamic-loading, dynamic-linking, static-linking, fallback-dynamic-
+# loading} is active), so they cannot both be in the dependency line at once.
+default = ["cuda-static"]
+
+# Launch proof (Plan 01/02): static toolkit link against the installed CUDA 12.8.
+# `cargo build` / `cargo test` use this by default — keeps Plans 01/02 green.
+cuda-static = ["cudarc/cuda-12080", "cudarc/dynamic-linking"]
+
+# Shipping wheel (Plan 03 / D-02): runtime CUDA resolution via the driver. Built
+# with `maturin build --release --no-default-features --features wheel` so the
+# cp310-abi3-win_amd64 wheel resolves CUDA at load time, not at build time.
+# `cuda-12080` is the CUDA *version* selector (chooses the binding ABI) and is
+# required in BOTH modes — cudarc's build.rs panics without a cuda-1xxxx feature
+# even under `dynamic-loading` (the version selector is orthogonal to the link
+# mode). `dynamic-loading` is the link MODE that defers symbol resolution to the
+# driver at runtime, which is what makes the wheel portable across CUDA installs.
+wheel = ["cudarc/cuda-12080", "cudarc/dynamic-loading"]
