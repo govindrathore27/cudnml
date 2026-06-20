@@ -55,14 +55,20 @@ pub struct SplitResult {
 }
 
 /// Context passed to the ET splitter for one node.
-pub struct EtSplitCtx<'a> {
+///
+/// Three lifetime parameters keep the borrow checker happy:
+/// - `'x` — lifetime of the feature matrix data.
+/// - `'y` — lifetime of the label/target slice.
+/// - `'r` — lifetime of the row-index slice (may be shorter than `'x`/`'y`
+///   because it comes from a locally-owned `Vec<usize>`).
+pub struct EtSplitCtx<'x, 'y, 'r> {
     /// Feature matrix, shape `(n_total_rows, n_features)`.
-    pub x: ArrayView2<'a, f32>,
+    pub x: ArrayView2<'x, f32>,
     /// Row indices for the current node (subset of `0..n_total_rows`).
-    pub rows: &'a [usize],
+    pub rows: &'r [usize],
     /// Target values for classification (class labels as 0-based integers cast
     /// to f32) or regression.
-    pub y: &'a [f32],
+    pub y: &'y [f32],
     /// Number of classes for classification (1 for regression).
     pub n_classes: usize,
     /// Resolved number of candidate features to try (already clamped to ≥1).
@@ -88,7 +94,7 @@ pub struct EtSplitCtx<'a> {
 /// Candidate features are drawn by shuffling `n_features` positions with the
 /// Philox RNG and taking the first `max_features`. Fixed-order float
 /// accumulation is used throughout (determinism rule).
-pub fn best_random_split(ctx: &EtSplitCtx<'_>) -> Option<SplitResult> {
+pub fn best_random_split(ctx: &EtSplitCtx<'_, '_, '_>) -> Option<SplitResult> {
     let n_rows = ctx.rows.len();
     let n_features = ctx.x.ncols();
 
@@ -207,7 +213,7 @@ pub fn best_random_split(ctx: &EtSplitCtx<'_>) -> Option<SplitResult> {
 ///
 /// Note: we return a `NodeStats` that child sides can reuse, so we only
 /// compute the parent's counts/targets once.
-fn node_stats(ctx: &EtSplitCtx<'_>) -> (f32, NodeTargets) {
+fn node_stats(ctx: &EtSplitCtx<'_, '_, '_>) -> (f32, NodeTargets) {
     match ctx.task {
         Task::Classification { n_classes: _ } => {
             // Tally class counts (integers — can be in any order; we use fixed
@@ -235,7 +241,7 @@ fn node_stats(ctx: &EtSplitCtx<'_>) -> (f32, NodeTargets) {
 }
 
 /// Child impurity given the child's rows, reusing parent label type.
-fn compute_impurity(ctx: &EtSplitCtx<'_>, rows: &[usize], _parent: &NodeTargets) -> f32 {
+fn compute_impurity(ctx: &EtSplitCtx<'_, '_, '_>, rows: &[usize], _parent: &NodeTargets) -> f32 {
     match ctx.task {
         Task::Classification { n_classes } => {
             let mut counts = vec![0u64; n_classes];
@@ -264,7 +270,7 @@ fn compute_impurity(ctx: &EtSplitCtx<'_>, rows: &[usize], _parent: &NodeTargets)
 }
 
 /// Class counts over a node's rows. Integer accumulation — order-independent.
-fn class_counts(ctx: &EtSplitCtx<'_>) -> Vec<u64> {
+fn class_counts(ctx: &EtSplitCtx<'_, '_, '_>) -> Vec<u64> {
     let n_classes = match ctx.task {
         Task::Classification { n_classes } => n_classes,
         Task::Regression => 1,
