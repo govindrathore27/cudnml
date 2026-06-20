@@ -5,7 +5,7 @@
 
 [workspace]
 resolver = "2"
-members = ["crates/sylva-cuda"]
+members = ["crates/sylva-cuda", "crates/sylva-core"]
 
 # Shared package metadata inherited by member crates via `*.workspace = true`.
 # Keeps the license + MSRV pinned in one place (no hardcoded duplication).

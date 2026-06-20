@@ -1,0 +1,24 @@
+# sylva-core — device-neutral contracts + the pure-Rust CPU correctness oracle.
+# Phase 2 lays the trait seam, the SoA ForestIR, and the Philox RNG.
+# CRITICAL (ENG-01): NO cudarc, NO pyo3 here — this crate is device-neutral and
+# CUDA-free. A plain `lib` (no cdylib).
+[package]
+name = "sylva-core"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Device-neutral contracts + pure-Rust CPU oracle for Sylva (Phase 2)."
+
+[dependencies]
+ndarray = "0.16"                                  # CPU array views/owned arrays.
+rayon = "1"                                       # data-parallel forest build (across trees).
+serde = { version = "1", features = ["derive"] }  # ForestIR (de)serialization.
+serde_json = "1"                                  # round-trip + Treelite-export later.
+thiserror = { workspace = true }                  # typed SylvaError (no .unwrap on fallible paths).
+
+[dev-dependencies]
+proptest = "1"                                    # property invariants (Plan 02-04).
+approx = "0.5"                                     # f32 tolerance assertions.
