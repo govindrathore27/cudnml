@@ -87,7 +87,7 @@ Plans:
 - **Dataset / shape:** A small public dataset — `make_classification` (e.g. 20k×50) and/or a Covertype subset — fixed seed, identical hyperparameters across both implementations.
 - **Pass bar:** **Parity within stated tolerance is the gate** (accuracy within CI, split-distribution equivalent). Training-time difference is **reported, not gated** — speed is informational at this phase.
 
-**Plans**: 3/5 plans executed
+**Plans**: 4/5 plans executed
 Plans:
 **Wave 1**
 
@@ -103,7 +103,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 02-04-PLAN.md — Property invariants + byte-determinism + parity contract doc + split_statistics extractor (EST-07, ENG-04)
+- [x] 02-04-PLAN.md — Property invariants + byte-determinism + parity contract doc + split_statistics extractor (EST-07, ENG-04)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -301,7 +301,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Toolchain Spike (Gate 1) | 3/3 | Complete    | 2026-06-20 |
-| 2. CPU Oracle, Contracts & Forest IR | 3/5 | In Progress|  |
+| 2. CPU Oracle, Contracts & Forest IR | 4/5 | In Progress|  |
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
 | 4. Single GPU ExtraTree | 0/TBD | Not started | - |
 | 5. Full Forest, RandomForest & sklearn Estimators | 0/TBD | Not started | - |

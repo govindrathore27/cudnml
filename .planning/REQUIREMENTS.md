@@ -19,7 +19,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ENG-01**: A device-neutral `trait Backend` defines all device ops (quantize, build_histograms, eval_splits, partition, predict); CUDA types never cross the trait boundary
 - [ ] **ENG-02**: A SoA `ForestIR` (feature_id / threshold / left / right / default-child / leaf-value arrays) is the single shared representation written by training and read read-only by inference, SHAP, and export
 - [x] **ENG-03**: A pure-Rust `CpuBackend` (ndarray + rayon) trains and predicts ET + RF correctly, serving as the differential-test oracle and small-data / `device="cpu"` path
-- [ ] **ENG-04**: The documented parity contract is defined: Sylva's own bit-identical CPU↔GPU RNG per seed and distributional equivalence to scikit-learn (NOT bit-identical reproduction of sklearn's serial PRNG)
+- [x] **ENG-04**: The documented parity contract is defined: Sylva's own bit-identical CPU↔GPU RNG per seed and distributional equivalence to scikit-learn (NOT bit-identical reproduction of sklearn's serial PRNG)
 - [x] **ENG-05**: NaN / missing-value routing policy is defined and implemented consistently across CPU and GPU paths
 - [ ] **ENG-06**: Stateless counter-based Philox-4×32-10 RNG is implemented identically in Rust and the CUDA kernel, keyed by (seed, tree, node, feature, draw)
 
@@ -36,7 +36,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **EST-04**: Core fitted attributes — `classes_`, `n_classes_`, `n_features_in_`, `feature_names_in_`, `estimators_`, `feature_importances_` (real MDI — direct cuML gap)
 - [ ] **EST-05**: `sample_weight` is supported end-to-end via a weighted-histogram kernel (full `check_estimator` parity)
 - [ ] **EST-06**: `sklearn.utils.estimator_checks.check_estimator` passes in CI, with any intentional exceptions explicitly documented
-- [ ] **EST-07**: Differential tests vs scikit-learn (accuracy/distribution within stated tolerance) and property-based invariants (child rows partition parent, leaf probabilities valid, seed determinism, serialization round-trip)
+- [x] **EST-07**: Differential tests vs scikit-learn (accuracy/distribution within stated tolerance) and property-based invariants (child rows partition parent, leaf probabilities valid, seed determinism, serialization round-trip)
 
 ### GPU Training
 
@@ -124,10 +124,10 @@ Which phases cover which requirements. Populated during roadmap creation.
 | ENG-01 | Phase 2 | Pending |
 | ENG-02 | Phase 2 | Pending |
 | ENG-03 | Phase 2 | Complete |
-| ENG-04 | Phase 2 | Pending |
+| ENG-04 | Phase 2 | Complete |
 | ENG-05 | Phase 2 | Complete |
 | ENG-06 | Phase 2 | Pending |
-| EST-07 | Phase 2 | Pending |
+| EST-07 | Phase 2 | Complete |
 | QUANT-01 | Phase 3 | Pending |
 | QUANT-02 | Phase 3 | Pending |
 | GPU-01 | Phase 4 | Pending |
