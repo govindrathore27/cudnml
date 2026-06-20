@@ -1,0 +1,27 @@
+# Python packaging for the sylva-core test-only PyO3 seam.
+#
+# Build with: maturin develop --manifest-path pyproject-pyseam.toml --features pyseam
+# Or:         cd crates/sylva-core && maturin develop --features pyseam
+#
+# This seam exposes fit_cpu / predict_cpu / split_statistics from CpuBackend to
+# the Phase-05 parity harness. It is TEST-ONLY and strictly below the full
+# sklearn-parity estimator API (EST-02), deferred to Phase 5.
+#
+# The default sylva-cuda wheel (pyproject.toml) is unchanged.
+[build-system]
+requires = ["maturin>=1.14,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "sylva-core-pyseam"
+description = "Test-only PyO3 seam: CpuBackend fit_cpu/predict_cpu/split_statistics (Phase-05 parity harness)."
+requires-python = ">=3.10"          # abi3-py310 floor.
+license = { text = "Apache-2.0" }
+dynamic = ["version"]                # version sourced from the crate.
+
+[tool.maturin]
+# Point maturin at the sylva-core crate and enable the pyseam feature.
+manifest-path = "crates/sylva-core/Cargo.toml"
+module-name = "sylva_core_pyseam"
+features = ["pyseam"]
+# abi3 wheel: one cp310-abi3-<platform> wheel works on any CPython >= 3.10.

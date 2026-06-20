@@ -1,7 +1,10 @@
 # sylva-core — device-neutral contracts + the pure-Rust CPU correctness oracle.
 # Phase 2 lays the trait seam, the SoA ForestIR, and the Philox RNG.
-# CRITICAL (ENG-01): NO cudarc, NO pyo3 here — this crate is device-neutral and
-# CUDA-free. A plain `lib` (no cdylib).
+# CRITICAL (ENG-01): NO cudarc here — this crate is device-neutral and CUDA-free.
+#
+# The optional `pyseam` feature gates a test-only PyO3 module (pyseam.rs) that
+# exposes fit_cpu / predict_cpu / split_statistics to Python for the Phase-05
+# parity harness. Default build (no features) stays pyo3-free AND cuda-free.
 [package]
 name = "sylva-core"
 version = "0.1.0"
@@ -12,8 +15,15 @@ authors.workspace = true
 repository.workspace = true
 description = "Device-neutral contracts + pure-Rust CPU oracle for Sylva (Phase 2)."
 
+# Both rlib and cdylib so `--features pyseam` produces the .pyd extension module
+# while the default `cargo test` path uses the rlib (no cdylib required there).
+[lib]
+crate-type = ["rlib", "cdylib"]
+
 [dependencies]
 ndarray = "0.16"                                  # CPU array views/owned arrays.
+numpy = { version = "0.29", optional = true }     # rust-numpy 0.29, tracks pyo3 0.29.
+pyo3 = { version = "0.29", features = ["extension-module", "abi3-py310"], optional = true }
 rayon = "1"                                       # data-parallel forest build (across trees).
 serde = { version = "1", features = ["derive"] }  # ForestIR (de)serialization.
 serde_json = "1"                                  # round-trip + Treelite-export later.
@@ -22,3 +32,9 @@ thiserror = { workspace = true }                  # typed SylvaError (no .unwrap
 [dev-dependencies]
 proptest = "1"                                    # property invariants (Plan 02-04).
 approx = "0.5"                                     # f32 tolerance assertions.
+
+[features]
+# Test-only PyO3 seam: exposes fit_cpu / predict_cpu / split_statistics to Python.
+# Strictly below EST-02 (the full sklearn-parity estimator API, deferred to Phase 5).
+# Default build must remain pyo3-free and cuda-free.
+pyseam = ["dep:pyo3", "dep:numpy"]

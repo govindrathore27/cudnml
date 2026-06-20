@@ -14,6 +14,11 @@ pub mod ir;
 pub mod parity;
 pub mod rng;
 
+// Test-only PyO3 seam (Phase-05 parity harness). Compiled only when the
+// `pyseam` Cargo feature is enabled; keeps the default crate graph pyo3-free.
+#[cfg(feature = "pyseam")]
+pub mod pyseam;
+
 pub use backend::{Backend, HistogramBackend, Predictions};
 pub use config::{Algo, Criterion, MaxFeatures, Task, TrainConfig};
 pub use cpu::CpuBackend;
