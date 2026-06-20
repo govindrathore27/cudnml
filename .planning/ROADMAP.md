@@ -87,7 +87,13 @@ Plans:
 - **Dataset / shape:** A small public dataset — `make_classification` (e.g. 20k×50) and/or a Covertype subset — fixed seed, identical hyperparameters across both implementations.
 - **Pass bar:** **Parity within stated tolerance is the gate** (accuracy within CI, split-distribution equivalent). Training-time difference is **reported, not gated** — speed is informational at this phase.
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 02-01-PLAN.md — sylva-core crate, device-neutral Backend trait, SoA ForestIR, Philox-4×32-10 + verified KAT vectors (ENG-01, ENG-02, ENG-06)
+- [ ] 02-02-PLAN.md — CpuBackend ExtraTrees slice: criterion, random-threshold splitter, recursive builder, NaN-safe predict (ENG-03, ENG-05)
+- [ ] 02-03-PLAN.md — CpuBackend RandomForest slice: bootstrap + exact best-split, completing ET/RF × clf/reg (ENG-03)
+- [ ] 02-04-PLAN.md — Property invariants + byte-determinism + parity contract doc + split_statistics extractor (EST-07, ENG-04)
+- [ ] 02-05-PLAN.md — Test-only PyO3 seam + sklearn calibration + distributional parity gate (ENG-04, EST-07)
 **UI hint**: no
 
 ### Phase 3: Feature Quantizer (CPU/GPU Bit-Parity)
