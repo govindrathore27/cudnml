@@ -16,7 +16,7 @@ Sylva proves a single, falsifiable thesis: GPU-native Extra Trees / Random Fores
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Toolchain Spike (Gate 1)** - Prove cudarc+NVRTC builds a debuggable, packageable CUDA kernel natively on Windows (completed 2026-06-20)
-- [ ] **Phase 2: CPU Oracle, Contracts & Forest IR** - Pure-Rust correctness oracle, Backend trait, SoA ForestIR, parity contract, differential tests
+- [x] **Phase 2: CPU Oracle, Contracts & Forest IR** - Pure-Rust correctness oracle, Backend trait, SoA ForestIR, parity contract, differential tests (completed 2026-06-20)
 - [ ] **Phase 3: Feature Quantizer (CPU/GPU Bit-Parity)** - SoA BinnedMatrix with bit-identical CPU↔GPU bin assignments
 - [ ] **Phase 4: Single GPU ExtraTree** - One GPU ExtraTree (privatized shared-mem histograms, breadth-first) bit-exact vs CPU oracle
 - [ ] **Phase 5: Full Forest, RandomForest & sklearn Estimators** - All four estimators with full sklearn-parity API, arena memory, prefix-sum RF splits
@@ -87,7 +87,7 @@ Plans:
 - **Dataset / shape:** A small public dataset — `make_classification` (e.g. 20k×50) and/or a Covertype subset — fixed seed, identical hyperparameters across both implementations.
 - **Pass bar:** **Parity within stated tolerance is the gate** (accuracy within CI, split-distribution equivalent). Training-time difference is **reported, not gated** — speed is informational at this phase.
 
-**Plans**: 4/5 plans executed
+**Plans**: 5/5 plans complete
 Plans:
 **Wave 1**
 
@@ -107,7 +107,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 02-05-PLAN.md — Test-only PyO3 seam + sklearn calibration + distributional parity gate (ENG-04, EST-07)
+- [x] 02-05-PLAN.md — Test-only PyO3 seam + sklearn calibration + distributional parity gate (ENG-04, EST-07)
 
 **UI hint**: no
 
@@ -301,7 +301,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Toolchain Spike (Gate 1) | 3/3 | Complete    | 2026-06-20 |
-| 2. CPU Oracle, Contracts & Forest IR | 4/5 | In Progress|  |
+| 2. CPU Oracle, Contracts & Forest IR | 5/5 | Complete   | 2026-06-20 |
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
 | 4. Single GPU ExtraTree | 0/TBD | Not started | - |
 | 5. Full Forest, RandomForest & sklearn Estimators | 0/TBD | Not started | - |

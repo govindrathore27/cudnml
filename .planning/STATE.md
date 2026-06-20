@@ -6,15 +6,15 @@ current_phase: 02
 current_phase_name: cpu-oracle-contracts-forest-ir
 status: executing
 stopped_at: Completed 02-04-PLAN.md (property invariants + determinism + parity contract + split_statistics)
-last_updated: "2026-06-20T17:47:00.000Z"
+last_updated: "2026-06-20T21:51:33.297Z"
 last_activity: 2026-06-20
-last_activity_desc: Phase 02 Plan 04 complete — EST-07 property side + ENG-04 parity contract
+last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 9
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
-  percent: 11
+  completed_plans: 8
+  percent: 22
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-19)
 ## Current Position
 
 Phase: 02 (cpu-oracle-contracts-forest-ir) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-06-20 — Phase 02 execution started
 
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P02 | 17 | 3 tasks | 6 files |
 | Phase 02 P03 | 21 | 3 tasks | 5 files |
 | Phase 02 P04 | 22min | 3 tasks | 5 files |
+| Phase 02 P05 | 350 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,10 @@ Recent decisions affecting current work:
 - [Phase ?]: assemble_forest adjusts child ids and leaf_offsets by global offset
 - [02-04]: proptest invariants + byte-identical determinism proven for all four estimators (ET/RF x clf/reg) — EST-07 property side complete; 1-thread rayon pool proves order-independence without bypassing rayon
 - [02-04]: PARITY.md (ENG-04) locked — EXACT vs DISTRIBUTIONAL parity contract documented; sklearn our_rand_r serial PRNG explicitly ruled infeasible to replay; split_statistics extractor seam for Phase-05 KS harness
+- [Phase ?]: JSON string as ForestIR FFI handle across PyO3 boundary
+- [Phase ?]: KS p-value floor = 0.05 standard threshold (calibrated null >> 0.05)
+- [Phase ?]: KS gate informational-only for regression at max_depth=12 (Philox vs our_rand_r divergence)
+- [Phase ?]: numpy crate = 0.29 to match pyo3 0.29 (links=python conflict with 0.25)
 
 ### Pending Todos
 
@@ -108,6 +113,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20T17:34:12.102Z
+Last session: 2026-06-20T21:51:33.291Z
 Stopped at: Phase 2 context gathered
 Resume file: .planning/phases/02-cpu-oracle-contracts-forest-ir/02-CONTEXT.md
