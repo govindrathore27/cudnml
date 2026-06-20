@@ -9,8 +9,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Toolchain (Gate 1)
 
-- [ ] **TOOL-01**: A throwaway spike builds a hand-written CUDA C kernel via cudarc 0.19.8 + NVRTC and launches it on the local NVIDIA GPU, natively on Windows/MSVC (no WSL)
-- [ ] **TOOL-02**: `compute-sanitizer` runs against the spike kernel and reports clean (toolchain is debuggable)
+- [x] **TOOL-01**: A throwaway spike builds a hand-written CUDA C kernel via cudarc 0.19.8 + NVRTC and launches it on the local NVIDIA GPU, natively on Windows/MSVC (no WSL)
+- [x] **TOOL-02**: `compute-sanitizer` runs against the spike kernel and reports clean (toolchain is debuggable)
 - [ ] **TOOL-03**: A minimal PyO3 + maturin `abi3` wheel builds and imports in a clean Python environment on Windows
 - [ ] **TOOL-04**: Pinned, verified versions recorded for cudarc feature flags, rust-numpy↔PyO3 compatibility, and CUDA toolkit; documented kill-criteria result (proceed / WSL-fallback / stop)
 
@@ -117,8 +117,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOOL-01 | Phase 1 | Pending |
-| TOOL-02 | Phase 1 | Pending |
+| TOOL-01 | Phase 1 | Complete |
+| TOOL-02 | Phase 1 | Complete |
 | TOOL-03 | Phase 1 | Pending |
 | TOOL-04 | Phase 1 | Pending |
 | ENG-01 | Phase 2 | Pending |
@@ -157,6 +157,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | EXP-03 | Phase 9 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 38 total (enumerated IDs; supersedes the earlier header estimate of 33)
 - Mapped to phases: 38 ✓
 - Unmapped: 0 ✓
