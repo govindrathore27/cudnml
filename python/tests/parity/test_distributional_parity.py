@@ -382,14 +382,16 @@ def _run_parity_reg(
 
     # --- SC-6 KS gate: INFORMATIONAL ONLY for regression ---
     # The feature-frequency KS gate is valid for classification but NOT for
-    # deep regression trees (max_depth=12) with different RNGs.  At shallow
-    # depths (max_depth<=4), Sylva and sklearn produce identical feature
-    # distributions (KS p > 0.99).  At max_depth=12, compounding RNG
-    # divergence (Sylva: Philox-4x32-10; sklearn: our_rand_r) causes the
-    # distributions to diverge (KS p~0.0001).  This is expected per
-    # RESEARCH Pitfall #1 (sklearn serial RNG cannot be replayed in parallel)
-    # and does NOT indicate an algorithmic correctness failure.  The R2
-    # accuracy gate above is the substantive correctness check for regression.
+    # deep regression trees (max_depth=12).  PROVEN by test_shallow_depth_proof.py:
+    # at shallow depth (max_depth=4) Sylva and sklearn feature distributions MATCH
+    # (KS p=0.27, non-significant), and only at max_depth=12 do they diverge
+    # (KS p~1e-4) as the independent RNG streams (Sylva: Philox-4x32-10;
+    # sklearn: our_rand_r serial) compound across many splits.  NOTE: both clf and
+    # reg use max_features=sqrt (datasets.py) -- the clf-passes/reg-fails asymmetry
+    # is RNG-compounding at depth, NOT a max_features difference.  This is expected
+    # per RESEARCH Pitfall #1 (sklearn's serial RNG cannot be replayed in parallel)
+    # and is NOT an algorithmic correctness failure; the R2 gate above is the
+    # substantive correctness check for regression.
     ks_floor_freq = thresholds[threshold_key]["ks_pvalue_floor_freq"]
     ks_floor_thr = thresholds[threshold_key]["ks_pvalue_floor_thr"]
     freq_sylva = _feature_frequency_distribution(sylva_fids, n_features)
