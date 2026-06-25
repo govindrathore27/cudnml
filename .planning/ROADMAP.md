@@ -301,7 +301,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Toolchain Spike (Gate 1) | 3/3 | Complete    | 2026-06-20 |
-| 2. CPU Oracle, Contracts & Forest IR | 5/5 | Complete   | 2026-06-20 |
+| 2. CPU Oracle, Contracts & Forest IR | 5/5 | Complete    | 2026-06-20 |
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
 | 4. Single GPU ExtraTree | 0/TBD | Not started | - |
 | 5. Full Forest, RandomForest & sklearn Estimators | 0/TBD | Not started | - |
