@@ -133,7 +133,11 @@ Plans:
 - **Dataset / shape:** A medium dense matrix — e.g. `make_classification` 100k×100 float32 with a fixed bin count (128/256) — pinned versions, fixed seed.
 - **Pass bar:** **Binning correctness within tolerance is the gate.** Throughput is reported as an op-level microbench, **not** an end-to-end speed claim.
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — CPU Quantizer slice: SoA BinnedMatrix (uint8/uint16) + exact-quantile edges (numpy-linear, A1-calibrated) + NaN-first searchsorted assignment + QuantizeReport (QUANT-01 CPU half)
+- [ ] 03-02-PLAN.md — QUANT-02 bit-parity contract: golden-vector fixtures + Rust parity test (CPU bins == golden, Phase-4 no-FMA/no-fast-math metadata forward-carried)
+- [ ] 03-03-PLAN.md — quantize_cpu pyseam fn + Python baseline harness: numpy edge-exact 100% GATE + sklearn distributional (informational) + throughput microbench (reported, not gated)
 **UI hint**: no
 
 ### Phase 4: Single GPU ExtraTree

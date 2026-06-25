@@ -1,8 +1,8 @@
 ---
 phase: 3
 slug: feature-quantizer-cpu-gpu-bit-parity
-status: draft
-nyquist_compliant: false
+status: planned
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-06-26
 ---
@@ -43,18 +43,18 @@ created: 2026-06-26
 > map each requirement to its test type from `03-RESEARCH.md` §Validation Architecture.
 > `Threat Ref` ties to the §Security Domain table (V5 input validation, ASVS L1).
 
-| Requirement | Test Type | Verification (target) | Threat Ref | Status |
-|-------------|-----------|-----------------------|------------|--------|
-| QUANT-01 SoA `BinnedMatrix` uint8 (≤256 bins) | unit | `cargo test -p sylva-core quantize::binned_matrix` — column-major SoA, u8 path | — | ⬜ pending |
-| QUANT-01 uint16 path (>256 bins, D-08) | unit | `cargo test -p sylva-core quantize::dtype_u16` | bin-overflow guard | ⬜ pending |
-| QUANT-01 exact-quantile edges, deduped (D-01/D-02) | unit | `cargo test -p sylva-core quantize::edges` — raw `numpy.quantile method='linear'` edges, `np.unique` dedupe | — | ⬜ pending |
-| QUANT-01 bins ∈ [0,n_bins); monotone; NaN→missing | property | `cargo test -p sylva-core quantize::props` (proptest) | NaN/Inf routing | ⬜ pending |
-| QUANT-02 CPU bins == golden vectors on fixed seed | integration | `cargo test -p sylva-core quantize::parity_golden` — the bit-parity CONTRACT (golden fixtures, not a live GPU run this phase) | — | ⬜ pending |
-| QUANT-02 pure-compare (`v <= edge`) assignment documented for Phase-4 GPU reuse | contract doc | asserted in golden-fixture metadata; no FMA / `--use_fast_math` in the future assign kernel | — | ⬜ pending |
-| SC-4 edge-exact bin agreement vs `numpy.quantile` = 100% (GATE) | integration | `pytest tests/quantize_parity/test_numpy_oracle.py` | input validation (V5) | ⬜ pending |
-| SC-4 distributional agreement vs sklearn `_BinMapper` (informational) | integration | `pytest tests/quantize_parity/test_sklearn_distributional.py` — ≥99% expected, documented divergence | — | ⬜ pending |
-| SC-3 `QuantizeReport` records dtype/contiguity/bytes (H2D = N/A this phase) | unit | `cargo test -p sylva-core quantize::report` | — | ⬜ pending |
-| SC-5 quantize-throughput microbench (rows/s), reported not gated | benchmark | `pytest tests/quantize_parity/test_throughput.py` (op-level only, cold/warm separated, pinned versions — NO end-to-end speed claim) | — | ⬜ pending |
+| Requirement | Plan/Task | Test Type | Verification (target) | Threat Ref | Status |
+|-------------|-----------|-----------|-----------------------|------------|--------|
+| QUANT-01 SoA `BinnedMatrix` uint8 (≤256 bins) | 03-01 T2 | unit | `cargo test -p sylva-core quantize::binned_matrix` — column-major SoA, u8 path | T-03-01 | ⬜ pending |
+| QUANT-01 uint16 path (>256 bins, D-08) | 03-01 T3 | unit | `cargo test -p sylva-core quantize::dtype_u16` | T-03-01 bin-overflow guard | ⬜ pending |
+| QUANT-01 exact-quantile edges, deduped + A1 calibration (D-01/D-02) | 03-01 T1 | unit | `cargo test -p sylva-core quantize::edges` — raw `numpy.quantile method='linear'` edges, `np.unique` dedupe, A1 bit-equal | — | ⬜ pending |
+| QUANT-01 bins ∈ [0,n_bins); monotone; NaN→missing | 03-01 T3 | property | `cargo test -p sylva-core quantize::props` (proptest) | T-03-02 NaN/Inf routing | ⬜ pending |
+| QUANT-02 CPU bins == golden vectors on fixed seed | 03-02 T3 | integration | `cargo test -p sylva-core --test quantize_golden parity_golden` — the bit-parity CONTRACT (golden fixtures, not a live GPU run this phase) | T-03-05 | ⬜ pending |
+| QUANT-02 pure-compare (`v <= edge`) assignment documented for Phase-4 GPU reuse | 03-02 T1/T2 | contract doc | asserted in golden-fixture metadata; no FMA / `--use_fast_math` in the future assign kernel | T-03-05 | ⬜ pending |
+| SC-4 edge-exact bin agreement vs `numpy.quantile` = 100% (GATE) | 03-03 T2 | integration | `pytest tests/quantize_parity/test_numpy_oracle.py` | T-03-07 input validation (V5) | ⬜ pending |
+| SC-4 distributional agreement vs sklearn `_BinMapper` (informational) | 03-03 T3 | integration | `pytest tests/quantize_parity/test_sklearn_distributional.py` — ≥99% expected, documented divergence | — | ⬜ pending |
+| SC-3 `QuantizeReport` records dtype/contiguity/bytes (H2D = N/A this phase) | 03-01 T3 | unit | `cargo test -p sylva-core quantize::report` | — | ⬜ pending |
+| SC-5 quantize-throughput microbench (rows/s), reported not gated | 03-03 T3 | benchmark | `pytest tests/quantize_parity/test_throughput.py` (op-level only, cold/warm separated, pinned versions — NO end-to-end speed claim) | T-03-08 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -81,11 +81,13 @@ created: 2026-06-26
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (esp. A1 calibration before golden vectors)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 60s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify (every task in 03-01/02/03 carries a `cargo test` / `pytest` / build command)
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references — A1 calibration is 03-01 Task 1 (Wave 1, BEFORE golden vectors are frozen in 03-02 Wave 2); module + Rust tests in 03-01; golden fixture + loader in 03-02; Python harness in 03-03
+- [x] No watch-mode flags
+- [x] Feedback latency < 60s (Rust `cargo test -p sylva-core quantize` subset)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Wave ordering note:** The A1 f64/f32 cast-point calibration micro-test is the FIRST task of Plan 03-01 (Wave 1). The golden-vector fixtures (Plan 03-02, Wave 2) are frozen against the A1-pinned edge math, satisfying the "A1 calibration before golden vectors" Wave-0 gate without a separate Wave-0 plan.
+
+**Approval:** approved (planner) — pending execution
