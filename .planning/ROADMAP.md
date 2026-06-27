@@ -209,7 +209,25 @@ Plans:
 - **Dataset / shape:** At least one large dense dataset — e.g. Higgs subset (~1M+ rows) and/or full Covertype (~581k×54) float32 — identical hyperparameters across implementations, pinned hardware/driver/CUDA/package versions.
 - **Pass bar:** Accuracy **parity** with the like-for-like sklearn baseline (gate); end-to-end speed **reported with the crossover caveat** — this study establishes the per-phase data point that feeds the authoritative Phase 7 crossover, and any region where Sylva loses is reported, not hidden. OOM/failures reported honestly.
 
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — TrainConfig max_samples + class_weight (EST-03) + feature_importances MDI from IR (EST-04) — device-neutral Rust foundation
+- [ ] 05-02-PLAN.md — GPU full forest: many-tree breadth-first scheduler + per-tree Philox bootstrap + integer sibling-histogram subtraction; ET forest GPU==CPU bit-exact (GPU-03)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 05-03-PLAN.md — RF best-split over bins (privatized hist → inclusive scan → argmax) + additive binned-canonical CPU oracle path + sample_weight fixed-point weighted histogram; RF GPU==CPU(binned) bit-exact (GPU-04, EST-05)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 05-04-PLAN.md — fit-scoped safe-slab arena (no per-node alloc) + small/deep-node CPU leaf-finishing cutover + four-tool compute-sanitizer gate (GPU-05, GPU-06)
+- [ ] 05-05-PLAN.md — promote pyseam to estimator seam + four sklearn-parity estimators (BaseEstimator, honest dispatch) + check_estimator CI gate (EST-01, EST-02, EST-03, EST-04, EST-06)
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 05-06-PLAN.md — Comparative Baseline Study: end-to-end-from-numpy ET/RF vs sklearn/cuML/XGBoost, accuracy parity gate + speed reported with crossover caveat (cuML availability behind a blocking human-verify checkpoint)
 **UI hint**: no
 
 ### Phase 6: Determinism & Honest Dispatch
@@ -327,7 +345,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. CPU Oracle, Contracts & Forest IR | 5/5 | Complete    | 2026-06-20 |
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
 | 4. Single GPU ExtraTree | 0/3 | Not started | - |
-| 5. Full Forest, RandomForest & sklearn Estimators | 0/TBD | Not started | - |
+| 5. Full Forest, RandomForest & sklearn Estimators | 0/6 | Not started | - |
 | 6. Determinism & Honest Dispatch | 0/TBD | Not started | - |
 | 7. Crossover Benchmark (Gate 3) | 0/TBD | Not started | - |
 | 8. Exact Tree SHAP (Gate 2 + Implementation) | 0/TBD | Not started | - |
