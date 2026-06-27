@@ -317,7 +317,24 @@ Plans:
 - **Dataset / shape:** A deep-tree scenario — a forest trained on a medium dense dataset (e.g. Covertype subset) at high `max_depth` so the explanation cost is meaningful, plus a fixed explain-set of rows.
 - **Pass bar:** **Attribution agreement within float tolerance is the gate.** Speedup vs the references is reported (with agreement beside it); a faster-but-wrong result is not a win.
 
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+**Wave 0** *(blocking checkpoint — must complete before Wave 1)*
+
+- [ ] 08-01-PLAN.md — Gate-2 feasibility spike: WoodelfHD + GPUTreeSHAP + shap license verification; kill criterion evaluation; GPU integration path decision (Option A or C); committed decision record (SHAP-01)
+
+**Wave 1** *(blocked on Wave 0 approval)*
+
+- [ ] 08-02-PLAN.md — sylva-shap crate scaffold (rlib, workspace member) + CPU exact TreeSHAP core: PathEntry/extend/unwind + base_value.rs + compute_shap_cpu with rayon row-parallelism, f64 accumulation, additivity + NaN tests (SHAP-01, SHAP-02)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 08-03-PLAN.md — py_shap_values + py_ir_to_shap_dict PyO3 seam in pyseam.rs + shap.TreeExplainer agreement gate (pytest, atol 1e-4 shallow / 5e-4 deep, additivity check, classifier list-of-arrays convention) (SHAP-02, SHAP-03)
+
+**Wave 3** *(blocked on Wave 2 completion; optional — contingent on Gate-2 GPU verdict)*
+
+- [ ] 08-04-PLAN.md — GPU SHAP kernel (Option A: CUDA C via NVRTC) or stub (Option C: CPU-only deferral) + comparative baseline speedup study: sylva vs shap.TreeExplainer CPU, agreement reported alongside speed (SHAP-02)
+
 **UI hint**: no
 
 ### Phase 9: Treelite Export & Packaging
