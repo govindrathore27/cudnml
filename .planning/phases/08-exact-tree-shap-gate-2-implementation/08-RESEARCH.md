@@ -593,7 +593,14 @@ Security enforcement enabled (`security_enforcement: true`).
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> Resolved by the orchestrator before planning; locked in the plans:
+> - **Q1 RESOLVED:** GPU integration path = reimplement the GPUTreeSHAP algorithm in CUDA C via NVRTC (no C++ FFI); expressibility confirmed in the Gate-2 spike (2h timebox), CPU-only fallback if blocked (Plan 08-01 / 08-04 Option A vs C).
+> - **Q2 RESOLVED:** WoodelfHD license read from the actual LICENSE file as the first Gate-2 spike action (websearch says MIT — verified there); kill criterion expected NOT to fire (Plan 08-01).
+> - **Q3 RESOLVED:** agreement tolerance atol=1e-4 (shallow) / 5e-4 (deep > max_depth 15), pinned by a shallow-then-deep validation run (Plan 08-03).
+> - **Q4 RESOLVED:** classifier SHAP output = sklearn-style list of per-class arrays (Plan 08-03).
+> - **Q5 RESOLVED:** base_value computed by leaf_offset-weighted DFS over the ForestIR (Plan 08-02).
 
 1. **GPU integration path confirmation**
    - What we know: GPUTreeSHAP is Apache-2.0 header-only C++; NVRTC cannot compile C++; GPU path options are (A) CUDA C reimplementation or (C) CPU-only for Phase 8.
