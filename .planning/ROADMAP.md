@@ -253,7 +253,7 @@ Plans:
 - **Dataset / shape:** The Phase 5 large dense dataset (e.g. Covertype / Higgs subset) at fixed hyperparameters, repeated runs, pinned versions.
 - **Pass bar:** Deterministic mode is **byte-reproducible (gate)** and its overhead is measured and reported (target consistent with research: ~95–98% throughput retention, i.e. small overhead — reported, not a hard gate). The external determinism gap is documented qualitatively.
 
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: no
 
 ### Phase 7: Crossover Benchmark (Gate 3)
@@ -388,7 +388,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
 | 4. Single GPU ExtraTree | 0/3 | Not started | - |
 | 5. Full Forest, RandomForest & sklearn Estimators | 0/6 | Not started | - |
-| 6. Determinism & Honest Dispatch | 0/TBD | Not started | - |
-| 7. Crossover Benchmark (Gate 3) | 0/TBD | Not started | - |
-| 8. Exact Tree SHAP (Gate 2 + Implementation) | 0/TBD | Not started | - |
-| 9. Treelite Export & Packaging | 0/TBD | Not started | - |
+| 6. Determinism & Honest Dispatch | 0/3 | Not started | - |
+| 7. Crossover Benchmark (Gate 3) | 0/3 | Not started | - |
+| 8. Exact Tree SHAP (Gate 2 + Implementation) | 0/4 | Not started | - |
+| 9. Treelite Export & Packaging | 0/3 | Not started | - |
