@@ -555,7 +555,14 @@ Where:
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> Resolved by the orchestrator before planning; locked in the plans / pre-registration:
+> - **OQ1 RESOLVED:** sklearnex ET-vs-RF acceleration + Windows CPU/GPU path confirmed at the baseline-availability `checkpoint:human-verify`, with the `sklearnex_et_patched` field recorded in the MANIFEST (Plan 07-02).
+> - **OQ2 RESOLVED:** Higgs via OpenML if available, else pre-registered fallback `make_classification(n=1_000_000, n_features=28)` (Plan 07-01 pre-registration).
+> - **OQ3 RESOLVED:** `deterministic=False` accessed via a try/except guard in `crossover_study.py` (confirmed when Phase 6 ships) (Plan 07-02).
+> - **OQ4 RESOLVED:** kill-criterion win = `WIN_THRESHOLD=0.05` AND speedup > observed run-to-run IQR (Plan 07-01 pre-registration).
+> - **OQ5 RESOLVED:** warm runs are primary for the kill criterion; cold reported alongside (Plan 07-01 / 07-03).
 
 1. **oneDAL/sklearnex on Windows — is it the CPU or GPU accelerated path?**
    - What we know: `scikit-learn-intelex` patches sklearn in-place via `patch_sklearn()`. On Intel CPUs, it routes to oneDAL which uses multi-threading and BLAS optimizations. On AMD CPUs the acceleration is partial. The measurement host (Windows, RTX 4060 Ti) may have an Intel or AMD CPU — unknown.
