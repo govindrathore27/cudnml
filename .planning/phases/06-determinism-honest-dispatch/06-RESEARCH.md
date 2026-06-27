@@ -448,7 +448,15 @@ def measure_determinism_overhead(X, y, repeats=7):
 
 **If this table is empty:** it is not — A1 (do 4/5 land deterministically?) and A2 (is there a non-deterministic fast path to measure against?) are the two the orchestrator/discuss-phase must resolve before locking the plan; they set Phase 6's scope.
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> Left open with recommendations per instructions; the orchestrator resolved them before planning — each is locked in the plans:
+> - **OQ1 RESOLVED:** front-load a non-determinism AUDIT task (Plan 06-03 Task 1) that enumerates surviving GPU non-determinism in the shipped 4/5 train path and pins each fix (re-validated against shipped code at execution).
+> - **OQ2 RESOLVED:** add a `deterministic=false` fast mode (scheduler branches on `cfg.deterministic`) so DET-02 overhead is a real Sylva-vs-Sylva number; if no real free-overlap path exists, document overhead≈0 with the reason (Plan 06-03 Tasks 2–3).
+> - **OQ3 RESOLVED:** `deterministic` default = `True` (safe mode) (Plan 06-02 `_base.py`).
+> - **OQ4 RESOLVED:** `fallback="error"` only in MVP; any other value → typed UnsupportedConfig raise; `device="cuda"` unmet → `SylvaError::DeviceUnavailable` (Plan 06-02).
+> - **OQ5 RESOLVED:** ExecutionReport reports zero `bytes_h2d` for the CPU path (Plan 06-01 test `cpu_report_has_zero_h2d`).
+> - **OQ6 RESOLVED:** external determinism-gap study (cuML/LightGBM-GPU not byte-reproducible) behind a `checkpoint:human-verify`; gates do not depend on it (Plan 06-03 Task 4).
 
 > Left open with recommendations per instructions; the orchestrator resolves them before planning.
 
