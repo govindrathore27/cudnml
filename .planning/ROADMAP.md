@@ -279,7 +279,19 @@ Plans:
 - **Dataset / shape:** A pre-registered grid spanning small→large n and low→high d (synthetic `make_classification` grid plus real anchors: Covertype, Higgs subset), pinned hardware/driver/CUDA/package versions, fixed hyperparameters identical across implementations.
 - **Pass bar:** A published surface that **honestly identifies the win/loss boundary**. The KILL CRITERION applies: if **no** region shows end-to-end GPU ExtraTrees beating the strongest CPU baseline, the premise is false → pivot. There is no "must win everywhere" bar — honesty about where CPU wins is itself a pass.
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — Pre-registration commit (frozen protocol, kill-criterion wording, pivot path) + crossover_manifest.py + grid_spec.py + fairness unit tests (BENCH-01, BENCH-02, BENCH-03)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 07-02-PLAN.md — crossover_study.py (n×d) grid harness with end-to-end timing + accuracy-parity gate tests + baseline-availability human-verify checkpoint (BENCH-01, BENCH-02)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 07-03-PLAN.md — Full measurement run + visualize_surface.py + crossover surface artifacts + kill-criterion human-verify checkpoint (BENCH-01, BENCH-02, BENCH-03)
 **UI hint**: no
 
 ### Phase 8: Exact Tree SHAP (Gate 2 + Implementation)
