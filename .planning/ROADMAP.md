@@ -169,7 +169,20 @@ Plans:
 - **Dataset / shape:** A medium dense dataset — e.g. Covertype subset or `make_classification` 200k×50 float32 — fixed seed, fixed `max_depth`, identical hyperparameters.
 - **Pass bar:** **GPU == CPU oracle bit-exact (gate)** and distributional parity vs sklearn. Single-tree timing is **reported, not gated**, and explicitly labeled as a transfer-inclusive single-tree number, not a forest speed claim.
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Parity spine: sylva-cuda→sylva-core dep, `-fmad=false` on every NVRTC compile, on-device CUDA-C Philox + KAT gate inside CudaBackend::new() (GPU-01, GPU-02 prereq)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-02-PLAN.md — First working GPU ET classifier: privatized integer-histogram count kernel + raw-range Philox split + scatter-partition, breadth-first scheduler, host-side scoring (cpu::criterion), assemble→ForestIR (GPU-01)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 04-03-PLAN.md — Phase gate: bit-exact GPU==CPU-oracle byte-compare (clf+reg) + regressor path + four-tool compute-sanitizer-clean targets + sklearn distributional/timing study (GPU-01, GPU-02)
+
 **UI hint**: no
 
 ### Phase 5: Full Forest, RandomForest & sklearn Estimators
@@ -313,7 +326,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Toolchain Spike (Gate 1) | 3/3 | Complete    | 2026-06-20 |
 | 2. CPU Oracle, Contracts & Forest IR | 5/5 | Complete    | 2026-06-20 |
 | 3. Feature Quantizer (CPU/GPU Bit-Parity) | 0/TBD | Not started | - |
-| 4. Single GPU ExtraTree | 0/TBD | Not started | - |
+| 4. Single GPU ExtraTree | 0/3 | Not started | - |
 | 5. Full Forest, RandomForest & sklearn Estimators | 0/TBD | Not started | - |
 | 6. Determinism & Honest Dispatch | 0/TBD | Not started | - |
 | 7. Crossover Benchmark (Gate 3) | 0/TBD | Not started | - |

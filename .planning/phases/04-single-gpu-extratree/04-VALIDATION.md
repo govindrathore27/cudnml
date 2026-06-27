@@ -1,8 +1,8 @@
 ---
 phase: 4
 slug: single-gpu-extratree
-status: draft
-nyquist_compliant: false
+status: planned
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-06-27
 ---
@@ -45,7 +45,12 @@ created: 2026-06-27
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| (from plans) | 01.. | 1.. | GPU-01 / GPU-02 | T-04-xx | no OOB / no data race in kernels | differential + sanitizer | `cargo test -p sylva-core parity_cpu_gpu` ; `compute-sanitizer ...` | ❌ W0 | ⬜ pending |
+| 04-01-T2/T3 | 01 | 1 | GPU-02 (ENG-06 reuse) | T-04-01/02/03 | on-device Philox stream == frozen KAT; no compile-error swallow | device unit/integration | `cargo test -p sylva-cuda --test philox_device_kat` | ❌ W0 | ⬜ pending |
+| 04-02-T1 | 02 | 2 | GPU-01 | T-04-04/06 | no OOB / no shared-mem race; integer atomics only | unit + (sanitizer in P03) | `cargo test -p sylva-cuda cuda_backend` | ❌ W0 | ⬜ pending |
+| 04-02-T3 | 02 | 2 | GPU-01 | T-04-05/07/08 | breadth-first build; valid ForestIR; typed errors | integration | `cargo test -p sylva-cuda cuda_backend` | ❌ W0 | ⬜ pending |
+| 04-03-T1 | 03 | 3 | GPU-02 | T-04-10 | GPU==CPU oracle byte-exact (clf+reg), no tolerance | differential (byte-compare) | `cargo test -p sylva-cuda --test parity_cpu_gpu` | ❌ W0 | ⬜ pending |
+| 04-03-T2/T4 | 03 | 3 | GPU-01 / GPU-02 | T-04-09 | no OOB/race/uninit in every kernel | sanitizer (4 tools) | `cargo test -p sylva-cuda --test sanitizer_et_kernels` + `compute-sanitizer --tool {memcheck,racecheck,synccheck,initcheck} <exe>` | ❌ W0 | ⬜ pending |
+| 04-03-T3 | 03 | 3 | GPU-01 (study) | T-04-11 | no end-to-end speed claim; transfer-inclusive | Python (reported) | `pytest python/tests/gpu_parity/` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -53,11 +58,16 @@ created: 2026-06-27
 
 ## Wave 0 Requirements
 
-- [ ] `crates/sylva-core/tests/parity_cpu_gpu.rs` — bit-exact GPU-vs-CPU-oracle differential test (the phase gate)
-- [ ] `crates/sylva-core/tests/philox_device_kat.rs` — on-device Philox KAT vs the frozen `kat.rs` vectors (proves the shared RNG stream before any tree is built)
-- [ ] `crates/sylva-core/tests/sanitizer_et_kernels.rs` (or scripted harness) — compute-sanitizer invocation across histogram / split-score / partition kernels
+> **Location reconciliation:** these gate tests live under `crates/sylva-cuda/tests/` (the
+> crate where `CudaBackend` lives), not `crates/sylva-core/tests/` — the original draft path.
+> RESEARCH.md + PATTERNS.md both place them in sylva-cuda; this is the corrected location.
 
-*If none of the above exist yet, Wave 0 of the plans installs them.*
+- [ ] `crates/sylva-cuda/tests/philox_device_kat.rs` — on-device Philox KAT vs the frozen `kat.rs` vectors (Plan 04-01, proves the shared RNG stream before any tree is built)
+- [ ] `crates/sylva-cuda/tests/parity_cpu_gpu.rs` — bit-exact GPU-vs-CPU-oracle differential test, clf + reg (Plan 04-03, the phase gate)
+- [ ] `crates/sylva-cuda/tests/sanitizer_et_kernels.rs` — standalone single-launch compute-sanitizer targets per ET kernel (Plan 04-03)
+- [ ] `python/tests/gpu_parity/` — sklearn distributional + transfer-inclusive timing study (Plan 04-03, informational)
+
+*Wave 0 of the plans installs these: Plan 04-01 creates the device-KAT test; Plan 04-03 creates the parity gate, sanitizer targets, and the Python study.*
 
 ---
 
@@ -71,7 +81,7 @@ created: 2026-06-27
 
 ## Nyquist Compliance
 
-- [ ] Every Phase-4 success criterion maps to an automated or manual verification above
-- [ ] GPU-01 and GPU-02 each have at least one gating check
-- [ ] The bit-exact differential gate is automated and runs on the dev host (the CPU-oracle half runs in GPU-less CI)
-- Set `nyquist_compliant: true` only after the gsd-planner / plan-checker confirm every `must_haves.truth` and `must_haves.prohibition` has a corresponding row.
+- [x] Every Phase-4 success criterion maps to an automated or manual verification above
+- [x] GPU-01 and GPU-02 each have at least one gating check (GPU-01: `cargo test -p sylva-cuda cuda_backend` + sanitizer; GPU-02: `parity_cpu_gpu` byte-compare + four-tool sanitizer)
+- [x] The bit-exact differential gate is automated and runs on the dev host (the CPU-oracle half runs in GPU-less CI)
+- Every `must_haves.truth` and `must_haves.prohibition` across the three plans has a corresponding row in the Per-Task Verification Map above (bit-exact byte-compare and four-tool sanitizer-clean are the non-negotiable rows; "no global float atomics" and "CPU oracle unmodified" are enforced by the integer-atomic kernel design + the `git diff` prohibition check).
