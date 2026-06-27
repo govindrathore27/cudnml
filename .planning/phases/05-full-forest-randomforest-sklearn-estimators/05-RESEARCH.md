@@ -415,7 +415,17 @@ fn gpu_rf_forest_matches_cpu_oracle_bit_exact() {
 | A6 | `sample_weight` determinism is achievable via fixed-point integer weight accumulation; pure-float weighted atomics would break DET-01 and sibling subtraction. | Pitfall 2 / OQ3 | If fixed-point precision is insufficient for sklearn parity, `check_sample_weight_equivalence` may need an `expected_failed_checks` entry with a documented 1-ULP reason. |
 | A7 | MDI computed in f64 internally then cast to f32 matches sklearn distributionally (sklearn computes in double). | Code Examples | If exact f32-accumulation is required for some gate, recompute in f32 with fixed order; distributional parity is the realistic bar (ENG-04). |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> All resolved by the orchestrator before planning; each is locked in the relevant PLAN.md `## Assumptions` with its rejected alternative:
+> - **OQ1 RESOLVED:** safe pre-sized fit-scoped slab (`alloc_zeros`, zero `unsafe`); raw `cuMemAllocAsync` pool deferred. (Plan 05-04)
+> - **OQ2 RESOLVED:** binned RF split is canonical — additive `best_split_binned` path added to the CPU oracle (raw path retained), re-validated vs Phase-2 distributional gate. (Plan 05-03)
+> - **OQ3 RESOLVED:** `sample_weight` accumulates as fixed-point integers (keeps sibling-subtraction exact; no float histogram atomics). (Plan 05-03)
+> - **OQ4 RESOLVED:** Python `BaseEstimator` subclasses over a Rust seam (not `#[pyclass]`). (Plan 05-05)
+> - **OQ5 RESOLVED:** `max_samples` added end-to-end to `TrainConfig`. (Plan 05-01/05-05)
+> - **OQ6 RESOLVED:** `class_weight` added end-to-end to `TrainConfig`. (Plan 05-01/05-05)
+> - **OQ7 RESOLVED:** cuML/XGBoost availability gated behind a blocking `checkpoint:human-verify` (WSL2 / honest "unavailable" fallback). (Plan 05-06)
+> - **OQ8 RESOLVED:** reuse `cpu::predict_forest` for the timing study; GPU predict kernel deferred. (Plan 05-06)
 
 1. **GPU-05 arena: raw `cuMemAllocAsync` pool vs safe pre-sized slab?**
    - What we know: cudarc 0.19.8's *safe* alloc (`alloc_zeros`/`clone_htod` on `CudaStream`) is **synchronous**, not stream-ordered `[CITED: docs.rs/cudarc/0.19.8]`. The raw `driver::sys` module exposes `cuMemAllocAsync`/`cuMemPoolCreate` FFI `[CITED: docs.rs cudarc driver::sys]`.
