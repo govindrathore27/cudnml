@@ -359,7 +359,20 @@ Plans:
 - **Dataset / shape:** A held-out test split of a medium/large dense dataset (e.g. Covertype) on a model trained in Phase 5, fixed batch sizes, pinned versions.
 - **Pass bar:** **Round-trip prediction parity within tolerance is the gate** (export is lossless). Inference-throughput numbers are reported with the fairness protocol; faster inference is a reported benefit, not the gate.
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 0** *(blocking checkpoint — must complete before Wave 1)*
+
+- [ ] 09-01-PLAN.md — Treelite-4.x API spike: confirm ModelBuilder path + postprocessor semantics; install treelite/tl2cgen; test scaffold + conftest (EXP-01, EXP-02)
+
+**Wave 1** *(blocked on Wave 0 approval)*
+
+- [ ] 09-02-PLAN.md — Finalize export_to_treelite() (ModelBuilder, global→tree-local reindex, identity postprocessor); GREEN gtil round-trip parity tests clf+reg (EXP-01, EXP-02)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 09-03-PLAN.md — TL2cgen compiled round-trip + abi3 wheel generalization + clean-venv smoke + INSTALL.md + inference throughput study (EXP-02, EXP-03)
+
 **UI hint**: no
 
 ## Progress
