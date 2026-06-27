@@ -472,7 +472,13 @@ py -m venv .venv-smoke-09
 
 **If this table is empty:** Not applicable — 8 ASSUMED claims exist; planner must gate A1 (the most critical) behind a mini-spike before committing to the full implementation.
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> Resolved by the orchestrator before planning; locked in the plans:
+> - **Q1 RESOLVED:** target the Treelite 4.x `ModelBuilder` API; a Wave-0 spike (Plan 09-01) confirms whether a 3.x `import_from_json` JSON shim also exists in the installed Treelite — ModelBuilder is the path regardless. (Deviates from the roadmap's literal SC#1 wording — flagged for a later ROADMAP update.)
+> - **Q2 RESOLVED:** classifier `task_type=kMultiClf` + `postprocessor="identity"` (leaves already store normalized `leaf_proba`); verified empirically by the Wave-0 spike + the gtil round-trip parity gate (Plan 09-01/09-02).
+> - **Q3 RESOLVED:** GPU FIL/nvForest is Linux/WSL2-only → a manual `checkpoint:human-verify` benchmark; `treelite.gtil.predict()` is the Windows-portable primary CI gate, TL2cgen compiled-CPU secondary (Plan 09-02/09-03).
+> - **Q4 RESOLVED:** the export glue + estimators ship in the `python/sylva/` package (per Phase 5); export consumes the ForestIR JSON handle via the existing pyseam contract — no new PyO3 binding.
 
 1. **Does `import_from_json()` still exist in Treelite 4.x as a compatibility shim?**
    - What we know: The function does not appear in the 4.7.x API docs or `frontend.py` source (mainline branch). The 3.x tutorial pages at treelite.readthedocs.io/en/3.9.0/tutorials/json_import.html are versioned 3.x only.
