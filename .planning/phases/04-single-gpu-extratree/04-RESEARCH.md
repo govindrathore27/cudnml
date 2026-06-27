@@ -388,7 +388,14 @@ fn gpu_single_tree_matches_cpu_oracle_bit_exact() {
 
 **If this table is empty:** it is not — A1 (the strategy fork) and A6 (entropy log2) are the two the planner/discuss-phase must resolve before locking the plan.
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> All five resolved by the orchestrator before planning; locked in every PLAN.md `## Assumptions`:
+> - **Q1 RESOLVED: Strategy A** (GPU replays raw-range split; histogram = integer counter only). Alternatives B/C rejected — both would mutate the verified Phase-2 oracle.
+> - **Q2 RESOLVED: upload both** raw X (for the `<=` partition + `[fmin,fmax]` range) and the Phase-3 `BinnedMatrix` (exercise the Phase-3→4 contract early, de-risk Phase 5).
+> - **Q3 RESOLVED: host-side scoring** from device integer counts (exact `criterion.rs` op order; zero device-float-parity risk).
+> - **Q4 RESOLVED:** pre-size device node arrays to `2^(max_depth+1)-1`; arena pool + small-node CPU cutover deferred to Phase 5.
+> - **Q5 RESOLVED:** reuse CPU `predict_forest` for the timing study; a GPU predict kernel is optional this phase (must be sanitizer-clean if added).
 
 1. **Bit-exact strategy: replay raw-range (A) vs binned-candidate (B) vs change the CPU oracle (C)?**
    - What we know: CPU `split_et.rs` draws `threshold = fmin + u*(fmax-fmin)` from the **raw f32** node range and partitions on raw `x[i,f] <= threshold`. The histogram literature splits on *bins*.
