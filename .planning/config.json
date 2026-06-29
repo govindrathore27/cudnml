@@ -45,7 +45,10 @@
     "security_enforcement": true,
     "security_asvs_level": 1,
     "security_block_on": "high",
-    "_auto_chain_active": false
+    "_auto_chain_active": false,
+    "cross_ai_execution": true,
+    "cross_ai_command": "codex exec",
+    "cross_ai_timeout": 1200
   },
   "ship": {
     "pr_body_sections": [
